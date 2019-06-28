@@ -2,11 +2,8 @@
 
 const express = require('express');
 const app = express();
-const port = 3000;
 const mongoose = require('mongoose');
-const mongoDbServer = '127.0.0.1:27017';
-const mongoDatabase = '';
-const mongoCollection = '';
+require('dotenv').config('.env');
 
 app.get('/channels', (req, res) => {
     mongoose.connect(`mongodb://${mongoDbServer}/${ mongoDatabase}`, { useNewUrlParser: true }, (err, response) => {
