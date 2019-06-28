@@ -16,7 +16,7 @@ app.get('/channels', (req, res) => {
         } else {
             const collection = response.db.collection(mongoCollection);
             collection.find().toArray((err, items) => {
-                //if (err) throw err;
+                if (err) return console.error(err);
                 res.status(200).json(items);
             });
         };
