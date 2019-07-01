@@ -16,7 +16,11 @@ app.get('/channels', (req, res) => {
         } else {
             const collection = response.db.collection(mongoCollection);
             collection.find().toArray((err, items) => {
-                if (err) return console.error(err);
+                if (err) {
+                    res.json(err.toString());
+                    return;
+                };
+                res.setHeader("Content-Type", "application/json");
                 res.status(200).json(items);
             });
         };
