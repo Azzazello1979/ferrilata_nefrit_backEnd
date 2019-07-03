@@ -28,9 +28,4 @@ app.get('/posts', (req, res) => {
     });
 });
 
-const backendServerStatus = app.listen(port, (err) => {
-    if (err) {
-        return console.log(err);
-    }
-    return console.log(`Server listening on port ${port}`);
-});
+app.listen(port, (err) => { console.log(err ? err : `Server listening on port ${port}`) });
