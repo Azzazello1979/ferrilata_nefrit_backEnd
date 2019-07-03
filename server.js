@@ -1,13 +1,13 @@
 'use strict';
 
-//require('dotenv').config('.env');
+require('dotenv').config('.env');
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 const port = 3000 //process.env.port;
-    //const mongoDbServer = process.env.mongoDbServer;
-    //const mongoDatabase = process.env.mongoDatabase;
-    //const mongoCollection = process.env.mongoCollection;
+const mongoDbServer = process.env.mongoDbServer;
+const mongoDatabase = process.env.mongoDatabase;
+const mongoCollection = process.env.mongoCollection;
 
 app.get('/channels', (req, res) => {
     mongoose.connect(`mongodb://${mongoDbServer}/${mongoDatabase}`, { useNewUrlParser: true }, (err, response) => {
