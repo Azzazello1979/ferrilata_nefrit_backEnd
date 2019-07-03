@@ -78,8 +78,5 @@ app.post('/login', (req, res) => {
 });
 
 app.listen(port, (err) => {
-    if (err) {
-        return console.log(err);
-    }
-    return console.log(`Server listening on port ${port}`);
+    console.log(err ? err : `Server listening on port ${port}`);
 });
