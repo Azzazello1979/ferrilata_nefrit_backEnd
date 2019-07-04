@@ -56,7 +56,7 @@ app.post('/refresh', function (req, res) {
     if (refreshToken in refreshTokens) {
         const user = { 'username': refreshTokens[refreshToken], }
         const token = jwt.sign(user, key, { expiresIn: 600 });
-        res.json({ jwt: token })
+        res.status(200).json({ jwt: token })
     }
     else {
         res.sendStatus(401);
@@ -109,12 +109,12 @@ app.post('/login', (req, res) => {
                         'message': 'Wrong username or password.'
                     });
                 } else {
-                    let rToken = jwt.sign({ id: items[0]._id, username: items[0].username }, key, { expiresIn: '30d' });
+                    let refreshToken = jwt.sign({ id: items[0]._id, username: items[0].username }, key, { expiresIn: '30d' });
                     let token = jwt.sign({ id: items[0]._id, username: items[0].username }, key, { expiresIn: '1hr' });
-                    refreshTokens[rToken] = req.body.username;
-                    let resData = { '_id': items[0]._id, 'username': items[0].username, tokens: { 'jwt': token, 'refreshToken': rToken } }
+                    refreshTokens[refreshToken] = req.body.username;
+                    let resData = { '_id': items[0]._id, 'username': items[0].username, tokens: { 'jwt': token, 'refreshToken': refreshToken } }
                     collection.update({ username: `${req.body.username}` },
-                        { $set: { refreshToken: `${rToken}` } })
+                        { $set: { refreshToken: `${refreshToken}` } })
                     return res.status(200).json(resData);
                 }
             }
