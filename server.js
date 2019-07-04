@@ -1,11 +1,12 @@
 'use strict';
 
+const middleware = require('./middleware');
 require('dotenv').config('.env');
 const port = process.env.port;
 const mongoDatabase = process.env.mongoDatabase;
 const mongoCollection = process.env.mongoCollection;
 const MongoClient = require('mongodb').MongoClient;
-const key = process.env.key
+const key = process.env.key;
 const uri = process.env.uri;
 const client = new MongoClient(uri, { useNewUrlParser: true });
 const mongoose = require('mongoose');
@@ -62,23 +63,6 @@ app.post('/refresh', function (req, res) {
         res.sendStatus(401);
     }
 });
-
-app.get('/', passport.authenticate('jwt'), (req, res) => {
-    mongo.connect((url), (err, client) => {
-        if (err) {
-            return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
-        } else {
-            const db = client.db(mongoDatabase);
-            const collection = db.collection('PostCollection');
-            collection.find().toArray((err, items) => {
-                if (err) throw err;
-                res.status(200).json(items);
-            })
-        }
-        // client.close();
-    })
-});
-
 
 //Define a schema
 
