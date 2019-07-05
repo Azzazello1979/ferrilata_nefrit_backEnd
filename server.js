@@ -60,7 +60,6 @@ app.post('/login', (req, res) => {
                 }
             }
         });
-        // client.close();
     });
 });
 
