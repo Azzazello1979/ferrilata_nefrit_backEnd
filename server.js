@@ -32,49 +32,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new JwtStrategy(passportOpts, function (jwtPayload, done) {
-    const expirationDate = new Date(jwtPayload.exp * 1000);
-    if (expirationDate < new Date()) {
-        return done(null, false);
-    }
-    done(null, jwtPayload);
-}))
-
-passport.serializeUser(function (user, done) {
-    done(null, user.username)
-});
-
-app.post('/logout', function (req, res) {
-    const refreshToken = req.body.refreshToken;
-    if (refreshToken in refreshTokens) {
-        delete refreshTokens[refreshToken];
-    }
-    res.sendStatus(204);
-});
-
-app.post('/refresh', function (req, res) {
-    const refreshToken = req.body.refreshToken;
-    if (refreshToken in refreshTokens) {
-        const user = { 'username': refreshTokens[refreshToken], }
-        const token = jwt.sign(user, key, { expiresIn: 600 });
-        res.status(200).json({ jwt: token })
-    }
-    else {
-        res.sendStatus(401);
-    }
-});
-
-//Define a schema
-
-const Schema = mongoose.Schema;
-const UserSchema = new Schema({
-    _id: String,
-    username: String,
-    password: String,
-    refreshToken: String
-});
-
-
 app.post('/login', (req, res) => {
     if (req.headers["content-type"] !== 'application/json') {
         return res.status(400).json({ "message": "Content-type is not specified." });
