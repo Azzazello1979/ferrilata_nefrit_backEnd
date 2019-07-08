@@ -22,8 +22,6 @@ app.use(cors());
 const passport = require('passport');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
-
-const refreshTokens = {};
 const passportOpts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: key
@@ -53,7 +51,6 @@ app.post('/login', (req, res) => {
                 } else {
                     let refreshToken = jwt.sign({ id: items[0]._id, username: items[0].username }, key, { expiresIn: '30d' });
                     let token = jwt.sign({ id: items[0]._id, username: items[0].username }, key, { expiresIn: '1hr' });
-                    refreshTokens[refreshToken] = req.body.username;
                     let resData = { '_id': items[0]._id, 'username': items[0].username, tokens: { 'jwt': token, 'refreshToken': refreshToken } }
                     collection.update({ username: `${req.body.username}` },
                         { $set: { refreshToken: `${refreshToken}` } })
@@ -98,8 +95,9 @@ app.get('/posts', (req, res) => {
 });
 app.post('/logout', function (req, res) {
     const refreshToken = req.body.refreshToken;
-
-    if (refreshToken in refreshTokens) {
+    if (!refreshToken) {
+        res.status(400).json({ message: 'Missing token.' });
+    } else {
         client.connect(err => {
             if (err) {
                 return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
@@ -117,29 +115,13 @@ app.post('/logout', function (req, res) {
                         } else {
                             collection.update({ refreshToken: `${refreshToken}` },
                                 { $set: { refreshToken: `` } })
-                            delete refreshTokens[refreshToken];
                             res.sendStatus(204);
                         }
                     }
                 })
             }
         })
-    } else {
-        res.status(400).json({ message: 'Missing token.' });
     }
 });
-
-app.post('/refresh', function (req, res) {
-    const refreshToken = req.body.refreshToken;
-    if (refreshToken in refreshTokens) {
-        const user = { 'username': refreshTokens[refreshToken], }
-        const token = jwt.sign(user, key, { expiresIn: 600 });
-        res.status(200).json({ jwt: token })
-    }
-    else {
-        res.sendStatus(401);
-    }
-});
-
 
 app.listen(port, (err) => { console.log(err ? err : `Server listening on port ${port}`) });
