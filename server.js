@@ -5,8 +5,8 @@ const mongoose = require('mongoose');
 require('dotenv').config('.env');
 const port = process.env.port;
 const mongoDatabase = process.env.mongoDatabase;
-const mongoCollection = process.env.mongoCollection;
-const mongoCollection2 = process.env.mongoCollection2;
+const userCollection = process.env.mongoCollection;
+const postsCollection = process.env.mongoCollection2;
 const MongoClient = require('mongodb').MongoClient;
 const key = process.env.key;
 const uri = process.env.uri;
@@ -41,7 +41,7 @@ app.post('/login', (req, res) => {
         if (err) {
             return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
         }
-        const collection = client.db(mongoDatabase).collection(mongoCollection);
+        const collection = client.db(mongoDatabase).collection(userCollection);
         collection.find({ username: `${req.body.username}`, password: `${req.body.password}` }).toArray((err, items) => {
             if (err) {
                 return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
@@ -68,7 +68,7 @@ app.get('/channels', (req, res) => {
         if (err) {
             return res.status(500).json({ "message": "Something went wrong, please try again later." });
         }
-        const collection = client.db(mongoDatabase).collection(mongoCollection2);
+        const collection = client.db(mongoDatabase).collection(postsCollection);
         collection.find({ channel: `${req.body.channel}` }).toArray((err, items) => {
             if (err) {
                 res.json(err.toString());
@@ -85,7 +85,7 @@ app.get('/posts', (req, res) => {
         if (err) {
             return res.status(500).json({ "message": "Something went wrong, please try again later." });
         }
-        const collection = client.db(mongoDatabase).collection(mongoCollection2);
+        const collection = client.db(mongoDatabase).collection(postsCollection);
         collection.find().toArray((err, items) => {
             if (err) {
                 res.json(err.toString());
@@ -106,7 +106,7 @@ app.post('/logout', function (req, res) {
                 return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
             }
             else {
-                const collection = client.db(mongoDatabase).collection(mongoCollection);
+                const collection = client.db(mongoDatabase).collection(userCollection);
                 collection.find({ refreshToken: `${refreshToken}` }).toArray((err, items) => {
                     if (err) {
                         return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
