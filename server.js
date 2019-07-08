@@ -108,8 +108,8 @@ app.post('/refresh-token', (req, res) => {
 
     const refreshToken = req.body.refreshToken;
     let token = "DIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-    token = token.slice(7, token.length); // payload part of access token
-    let decoded = jwt.decode(token); // decoding payload of token
+    let tokenPayload = token.slice(7, token.length); // payload part of access token
+    let decoded = jwt.decode(tokenPayload); // decoding payload of token
 
     mongoose.connect(`mongodb://${mongoDbServer}/${mongoDatabase}`, { useNewUrlParser: true }, (err, mongoResp) => {
         // 2. internal server error
@@ -119,28 +119,28 @@ app.post('/refresh-token', (req, res) => {
             return;
 
 
-            // 3. missing content type
+        // 3. missing content type
         } else if (req.headers["content-type"] !== 'application/json') {
             res.status(400).json({ "message": "Content-type is not specified." });
             return;
 
 
-            // 5. Missing refreshToken property from request body
+        // 5. Missing refreshToken property from request body
         } else if (!refreshToken) {
             res.setHeader("Content-Type", "application/json");
             res.status(400).json({ "message": "Missing refreshToken." });
             return;
 
 
-            // 4.a. refresh token is expired
+        // 4.a. refresh token is expired
         } else if (decoded.exp < new Date()) {
              res.status(401).json({ message: 'Expired Token' });
              return;
             
 
-            // 4.b. Invalid refresh token
-        } else if (token) {
-            jwt.verify(token, key, (err) => {
+        // 4.b. Invalid refresh token
+        } else if (tokenPayload) {
+            jwt.verify(tokenPayload, key, (err) => {
                 if (err) {
                     return res.status(401).json({ message: 'Token is not valid' });
                 } else {
@@ -149,17 +149,14 @@ app.post('/refresh-token', (req, res) => {
             })
 
 
-
-            // 1. valid request
+        // 1. valid request (if refreshToken from request is same as here), send new access token
         } else if (refreshToken === "RJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c") {
             res.setHeader("Content-Type", "application/json");
             res.status(200).json({ "token": "DIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" });
         }
 
 
-    }
-
-    );
+    })
 })
 
 
