@@ -64,7 +64,7 @@ app.post('/login', (req, res) => {
 });
 
 app.get('/channels', (req, res) => {
-   mongoose.connect(`mongodb://${mongoDbServer}/${mongoDatabase}`, { useNewUrlParser: true }, (err, response) => {
+    mongoose.connect(`mongodb://${mongoDbServer}/${mongoDatabase}`, { useNewUrlParser: true }, (err, response) => {
         if (err) {
             return res.status(500).json({ "message": "Something went wrong, please try again later." });
         } else {
@@ -100,5 +100,48 @@ app.get('/posts', (req, res) => {
         response.close();
     });
 });
+
+
+
+
+app.post('/refresh-token', (req, res) => {
+    mongoose.connect(`mongodb://${mongoDbServer}/${mongoDatabase}`, { useNewUrlParser: true }, (err, res) => {
+        // 2. internal server error
+        if (err) {
+            res.setHeader("Content-Type", "application/json");
+            res.status(500).json({ "message": "Something went wrong, please try again later." });
+            return
+
+
+        // 3. missing content type
+        } else if (req.headers["content-type"] !== 'application/json') {
+            res.status(400).json({ "message": "Content-type is not specified." });
+            return
+
+
+        // 5. Missing refreshToken property from request body
+        } else if (!req.body.refreshToken) {
+            res.setHeader("Content-Type", "application/json");
+            res.status(400).json({ "message": "Missing refreshToken." });
+            return
+
+
+        // 4. Invalid refresh token or refresh token is expired
+        } else if (req.body.refreshToken.expired < Date.now()  /* OR invalid*/ ) {
+            res.setHeader("Content-Type", "application/json");
+            res.status(401).json({ "message": "Refresh token is invalid or expired." })
+
+
+        // 1. valid request
+        } else if (req.body.refreshToken === "RJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c") {
+            res.setHeader("Content-Type", "application/json");
+            res.status(200).json({ "token": "DIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" })
+        }
+
+
+});
+
+
+
 
 app.listen(port, (err) => { console.log(err ? err : `Server listening on port ${port}`) });
