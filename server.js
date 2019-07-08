@@ -100,7 +100,6 @@ app.post('/logout', function (req, res) {
     const refreshToken = req.body.refreshToken;
 
     if (refreshToken in refreshTokens) {
-        delete refreshTokens[refreshToken];
         client.connect(err => {
             if (err) {
                 return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
