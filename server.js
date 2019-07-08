@@ -107,9 +107,10 @@ app.get('/posts', (req, res) => {
 app.post('/refresh-token', (req, res) => {
 
     const refreshToken = req.body.refreshToken;
-    let token = "DIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
-    let tokenPayload = token.slice(7, token.length); // payload part of access token
-    let decoded = jwt.decode(tokenPayload); // decoding payload of token
+    let accesToken = '';
+    refreshToken.jwt.verify(({}));
+    //let tokenPayload = token.slice(7, token.length);
+    //let decoded = jwt.decode(tokenPayload);
 
     mongoose.connect(`mongodb://${mongoDbServer}/${mongoDatabase}`, { useNewUrlParser: true }, (err, mongoResp) => {
         // 2. internal server error
@@ -149,7 +150,7 @@ app.post('/refresh-token', (req, res) => {
             })
 
 
-        // 1. valid request (if refreshToken from request is same as here), send new access token
+        // 1. valid request
         } else if (refreshToken === "RJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c") {
             res.setHeader("Content-Type", "application/json");
             res.status(200).json({ "token": "DIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" });
