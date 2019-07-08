@@ -105,43 +105,64 @@ app.get('/posts', (req, res) => {
 
 
 app.post('/refresh-token', (req, res) => {
-    mongoose.connect(`mongodb://${mongoDbServer}/${mongoDatabase}`, { useNewUrlParser: true }, (err, res) => {
+
+    const refreshToken = req.body.refreshToken;
+    let token = "DIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c";
+    token = token.slice(7, token.length); // payload part of access token
+    let decoded = jwt.decode(token); // decoding payload of token
+
+    mongoose.connect(`mongodb://${mongoDbServer}/${mongoDatabase}`, { useNewUrlParser: true }, (err, mongoResp) => {
         // 2. internal server error
         if (err) {
             res.setHeader("Content-Type", "application/json");
             res.status(500).json({ "message": "Something went wrong, please try again later." });
-            return
+            return;
 
 
-        // 3. missing content type
+            // 3. missing content type
         } else if (req.headers["content-type"] !== 'application/json') {
             res.status(400).json({ "message": "Content-type is not specified." });
-            return
+            return;
 
 
-        // 5. Missing refreshToken property from request body
-        } else if (!req.body.refreshToken) {
+            // 5. Missing refreshToken property from request body
+        } else if (!refreshToken) {
             res.setHeader("Content-Type", "application/json");
             res.status(400).json({ "message": "Missing refreshToken." });
-            return
+            return;
 
 
-        // 4. Invalid refresh token or refresh token is expired
-        } else if (req.body.refreshToken.expired < Date.now()  /* OR invalid*/ ) {
+            // 4.a. refresh token is expired
+        } else if (decoded.exp < new Date()) {
+             res.status(401).json({ message: 'Expired Token' });
+             return;
+            
+
+            // 4.b. Invalid refresh token
+        } else if (token) {
+            jwt.verify(token, key, (err) => {
+                if (err) {
+                    return res.status(401).json({ message: 'Token is not valid' });
+                } else {
+                    next();
+                }
+            })
+
+
+
+            // 1. valid request
+        } else if (refreshToken === "RJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c") {
             res.setHeader("Content-Type", "application/json");
-            res.status(401).json({ "message": "Refresh token is invalid or expired." })
-
-
-        // 1. valid request
-        } else if (req.body.refreshToken === "RJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c") {
-            res.setHeader("Content-Type", "application/json");
-            res.status(200).json({ "token": "DIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" })
+            res.status(200).json({ "token": "DIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" });
         }
 
 
-});
+    }
+
+    );
+})
 
 
 
 
-app.listen(port, (err) => { console.log(err ? err : `Server listening on port ${port}`) });
+app.listen(port, (err) => { console.log(err ? err : `Server listening on port ${port}`) })
