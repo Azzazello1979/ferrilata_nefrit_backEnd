@@ -37,7 +37,7 @@ app.post('/register', (req, res) => {
     "username": user.Data.username,
     "password": user.Data.password
   }
-  
+
   let startAccessToken = jwt.sign(newUserPayload, secretKey, { expiresIn: '300' }) // 5 mins.
 
   User.findOne({ username: userData.username }) //look up in database if such username is already registered
@@ -47,8 +47,8 @@ app.post('/register', (req, res) => {
         res.status(400).json({ "message": "Username is already taken." })
       } else { // ..if not, let's register user...
         let user = new User({
-          "username": user.Data.username,
           "password": user.Data.password,
+          "username": user.Data.username,
           "refreshToken": startRefreshToken
         })
         user.save((err, registeredUser) => {
@@ -59,7 +59,12 @@ app.post('/register', (req, res) => {
             return
           } else {
             res.setHeader("Content-Type", "application/json")
-            res.status(200).send(registeredUser)
+            res.status(200).json({
+              "_id": registeredUser._id,
+              "username": registeredUser.username,
+              "token": startAccessToken,
+              "refreshToken": registeredUser.refreshToken
+            })
           }
         })
       }
