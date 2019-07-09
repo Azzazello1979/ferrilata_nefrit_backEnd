@@ -3,7 +3,7 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
-const { User } = require('models/user');
+const User = require('./models/user');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const PORT = process.env.port;
@@ -18,6 +18,7 @@ app.use(bodyParser.json());
 
 
 const db = `mongodb+srv://${mongoUser}:${mongoPassword}@cluster0-siax1.mongodb.net/${mongoDatabase}?retryWrites=true&w=majority`;
+mongoose.set('useCreateIndex', true); // stop DeprecationWarning (node:9125) ... so you can use uniq:true in Schema
 
 mongoose.connect(db, { useNewUrlParser: true })
   .then(() => console.log('OK...connected to mongoDB'))
@@ -37,20 +38,20 @@ app.post('/register', (req, res) => {
   }
 
   // missing property from req. body, 400 error
-  if (!req.body.username) { 
+  if (!req.body.username && !req.body.password) { 
+    res.setHeader("Content-Type", "application/json");
+    res.status(400).json({ "message": "Missing username and password" });
+    return;
+
+  } else if (!req.body.username) {
+    
     res.setHeader("Content-Type", "application/json");
     res.status(400).json({ "message": "Missing username" });
     return;
 
-  } else if (!req.body.password) {
-    
+  } else if (!req.body.password){
     res.setHeader("Content-Type", "application/json");
     res.status(400).json({ "message": "Missing password" });
-    return;
-
-  } else if (!req.body.username && !req.body.password){
-    res.setHeader("Content-Type", "application/json");
-    res.status(400).json({ "message": "Missing username and password" });
     return;
   }
 
@@ -58,11 +59,11 @@ app.post('/register', (req, res) => {
   let startRefreshToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15); // 22 chars. long rand.string
 
   let newUserPayload = {
-    "username": user.Data.username,
-    "password": user.Data.password
+    username: userData.username,
+    password: userData.password
   };
 
-  let startAccessToken = jwt.sign(newUserPayload, secretKey, { expiresIn: '300' }); // 5 mins.
+  let startAccessToken = jwt.sign({newUserPayload}, secretKey, { expiresIn: '300' }); // 5 mins.
 
   User.findOne({ username: userData.username }) //look up in database if such username is already registered
     .then((user) => {
@@ -71,8 +72,8 @@ app.post('/register', (req, res) => {
         res.status(400).json({ "message": "Username is already taken." });
       } else { // ..if not, let's register user...
         let user = new User({
-          "password": user.Data.password,
-          "username": user.Data.username,
+          "password": userData.password,
+          "username": userData.username,
           "refreshToken": startRefreshToken
         });
         user.save((err, registeredUser) => {
@@ -94,9 +95,10 @@ app.post('/register', (req, res) => {
         })
       }
     }) // 500 internal server error
-    .catch((err) =>
-      res.setHeader("Content-Type", "application/json"),
-      res.status(500).json({ "message": "Something went wrong, please try again later." }));
+    .catch(
+      (err) => console.log(err)
+      );
+
 
 })
 
