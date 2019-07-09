@@ -1,15 +1,16 @@
 'use strict';
 
 const middleware = require('./middleware');
+const mongoose = require('mongoose');
 require('dotenv').config('.env');
 const port = process.env.port;
 const mongoDatabase = process.env.mongoDatabase;
-const mongoCollection = process.env.mongoCollection;
+const userCollection = process.env.mongoCollection;
+const postsCollection = process.env.mongoCollection2;
 const MongoClient = require('mongodb').MongoClient;
 const key = process.env.key;
 const uri = process.env.uri;
 const client = new MongoClient(uri, { useNewUrlParser: true });
-const mongoose = require('mongoose');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const app = express();
@@ -21,8 +22,6 @@ app.use(cors());
 const passport = require('passport');
 const JwtStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
-
-const refreshTokens = {};
 const passportOpts = {
     jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
     secretOrKey: key
@@ -40,7 +39,7 @@ app.post('/login', (req, res) => {
         if (err) {
             return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
         }
-        const collection = client.db(mongoDatabase).collection(mongoCollection);
+        const collection = client.db(mongoDatabase).collection(userCollection);
         collection.find({ username: `${req.body.username}`, password: `${req.body.password}` }).toArray((err, items) => {
             if (err) {
                 return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
@@ -52,7 +51,6 @@ app.post('/login', (req, res) => {
                 } else {
                     let refreshToken = jwt.sign({ id: items[0]._id, username: items[0].username }, key, { expiresIn: '30d' });
                     let token = jwt.sign({ id: items[0]._id, username: items[0].username }, key, { expiresIn: '1hr' });
-                    refreshTokens[refreshToken] = req.body.username;
                     let resData = { '_id': items[0]._id, 'username': items[0].username, tokens: { 'jwt': token, 'refreshToken': refreshToken } }
                     collection.update({ username: `${req.body.username}` },
                         { $set: { refreshToken: `${refreshToken}` } })
@@ -62,43 +60,68 @@ app.post('/login', (req, res) => {
         });
     });
 });
-
 app.get('/channels', (req, res) => {
-   mongoose.connect(`mongodb://${mongoDbServer}/${mongoDatabase}`, { useNewUrlParser: true }, (err, response) => {
+    client.connect(err => {
         if (err) {
             return res.status(500).json({ "message": "Something went wrong, please try again later." });
-        } else {
-            const collection = response.db.collection(mongoCollection);
-            collection.find().toArray((err, items) => {
-                if (err) {
-                    res.json(err.toString());
-                    return;
-                };
-                res.setHeader("Content-Type", "application/json");
-                res.status(200).json(items);
-            });
-        };
-        response.close();
+        }
+        const collection = client.db(mongoDatabase).collection(postsCollection);
+        collection.find({ channel: `${req.body.channel}` }).toArray((err, items) => {
+            if (err) {
+                res.json(err.toString());
+                return;
+            };
+            res.setHeader("Content-Type", "application/json");
+            res.status(200).json(items);
+        });
     });
 });
 
 app.get('/posts', (req, res) => {
-    mongoose.connect(`mongodb://${mongoDbServer}/${mongoDatabase}`, { useNewUrlParser: true }, (err, response) => {
+    client.connect(err => {
         if (err) {
             return res.status(500).json({ "message": "Something went wrong, please try again later." });
-        } else {
-            const collection = response.db.collection(mongoCollection);
-            collection.find().toArray((err, items) => {
-                if (err) {
-                    res.json(err.toString());
-                    return;
-                };
-                res.setHeader("Content-Type", "application/json");
-                res.status(200).json(items);
-            });
-        };
-        response.close();
+        }
+        const collection = client.db(mongoDatabase).collection(postsCollection);
+        collection.find().toArray((err, items) => {
+            if (err) {
+                res.json(err.toString());
+                return;
+            };
+            res.setHeader("Content-Type", "application/json");
+            res.status(200).json(items);
+        });
     });
+});
+app.post('/logout', function (req, res) {
+    const refreshToken = req.body.refreshToken;
+    if (!refreshToken) {
+        res.status(400).json({ message: 'Missing token.' });
+    } else {
+        client.connect(err => {
+            if (err) {
+                return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
+            }
+            else {
+                const collection = client.db(mongoDatabase).collection(userCollection);
+                collection.find({ refreshToken: `${refreshToken}` }).toArray((err, items) => {
+                    if (err) {
+                        return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
+                    } else {
+                        if (items.length < 1) {
+                            return res.status(404).json({
+                                'message': 'There is no such user.'
+                            });
+                        } else {
+                            collection.update({ refreshToken: `${refreshToken}` },
+                                { $set: { refreshToken: `` } })
+                            res.sendStatus(204);
+                        }
+                    }
+                })
+            }
+        })
+    }
 });
 
 app.listen(port, (err) => { console.log(err ? err : `Server listening on port ${port}`) });
