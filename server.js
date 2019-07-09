@@ -37,19 +37,20 @@ app.post('/register', (req, res) => {
     return;
   }
 
+
   // missing property from req. body, 400 error
-  if (!req.body.username && !req.body.password) { 
+  if (!req.body.username && !req.body.password) {
     res.setHeader("Content-Type", "application/json");
     res.status(400).json({ "message": "Missing username and password" });
     return;
 
   } else if (!req.body.username) {
-    
+
     res.setHeader("Content-Type", "application/json");
     res.status(400).json({ "message": "Missing username" });
     return;
 
-  } else if (!req.body.password){
+  } else if (!req.body.password) {
     res.setHeader("Content-Type", "application/json");
     res.status(400).json({ "message": "Missing password" });
     return;
@@ -63,7 +64,7 @@ app.post('/register', (req, res) => {
     password: userData.password
   };
 
-  let startAccessToken = jwt.sign({newUserPayload}, secretKey, { expiresIn: '300' }); // 5 mins.
+  let startAccessToken = jwt.sign({ newUserPayload }, secretKey, { expiresIn: '300' }); // 5 mins.
 
   User.findOne({ username: userData.username }) //look up in database if such username is already registered
     .then((user) => {
@@ -94,10 +95,12 @@ app.post('/register', (req, res) => {
           }
         })
       }
-    }) // 500 internal server error
-    .catch(
-      (err) => console.log(err)
-      );
+    }) 
+    .catch( // 500 internal server error
+      (err) => res.status(500)
+      .json({"message": "Something went wrong, please try again later." })
+      .console.log('Error '+ err)
+    );
 
 
 })
