@@ -3,18 +3,22 @@
 const middleware = require('./middleware');
 require('dotenv').config('.env');
 const port = process.env.port;
+const mongoDbServer = process.env.mongoDbServer
 const mongoDatabase = process.env.mongoDatabase;
 const mongoCollection = process.env.mongoCollection;
 const MongoClient = require('mongodb').MongoClient;
 const key = process.env.key;
 const uri = process.env.uri;
-const client = new MongoClient(uri, { useNewUrlParser: true });
+const client = new MongoClient(uri, {
+  useNewUrlParser: true
+});
 const mongoose = require('mongoose');
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const app = express();
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const Post = require('../ferrilata-nefrit-backend/backend/models/post');
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -24,81 +28,137 @@ const ExtractJwt = require('passport-jwt').ExtractJwt;
 
 const refreshTokens = {};
 const passportOpts = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: key
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: key
 };
 
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.post('/login', (req, res) => {
-    if (req.headers["content-type"] !== 'application/json') {
-        return res.status(400).json({ "message": "Content-type is not specified." });
-    }
-    client.connect(err => {
-        if (err) {
-            return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
-        }
-        const collection = client.db(mongoDatabase).collection(mongoCollection);
-        collection.find({ username: `${req.body.username}`, password: `${req.body.password}` }).toArray((err, items) => {
-            if (err) {
-                return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
-            } else {
-                if (items.length < 1) {
-                    return res.status(401).json({
-                        'message': 'Wrong username or password.'
-                    });
-                } else {
-                    let refreshToken = jwt.sign({ id: items[0]._id, username: items[0].username }, key, { expiresIn: '30d' });
-                    let token = jwt.sign({ id: items[0]._id, username: items[0].username }, key, { expiresIn: '1hr' });
-                    refreshTokens[refreshToken] = req.body.username;
-                    let resData = { '_id': items[0]._id, 'username': items[0].username, tokens: { 'jwt': token, 'refreshToken': refreshToken } }
-                    collection.update({ username: `${req.body.username}` },
-                        { $set: { refreshToken: `${refreshToken}` } })
-                    return res.status(200).json(resData);
-                }
-            }
-        });
+  if (req.headers["content-type"] !== 'application/json') {
+    return res.status(400).json({
+      "message": "Content-type is not specified."
     });
+  }
+  client.connect(err => {
+    if (err) {
+      return res.status(500).json({
+        'message': 'Something went wrong, please try again later.'
+      });
+    }
+    const collection = client.db(mongoDatabase).collection(mongoCollection);
+    collection.find({
+      username: `${req.body.username}`,
+      password: `${req.body.password}`
+    }).toArray((err, items) => {
+      if (err) {
+        return res.status(500).json({
+          'message': 'Something went wrong, please try again later.'
+        });
+      } else {
+        if (items.length < 1) {
+          return res.status(401).json({
+            'message': 'Wrong username or password.'
+          });
+        } else {
+          let refreshToken = jwt.sign({
+            id: items[0]._id,
+            username: items[0].username
+          }, key, {
+            expiresIn: '30d'
+          });
+          let token = jwt.sign({
+            id: items[0]._id,
+            username: items[0].username
+          }, key, {
+            expiresIn: '1hr'
+          });
+          refreshTokens[refreshToken] = req.body.username;
+          let resData = {
+            '_id': items[0]._id,
+            'username': items[0].username,
+            tokens: {
+              'jwt': token,
+              'refreshToken': refreshToken
+            }
+          }
+          collection.update({
+            username: `${req.body.username}`
+          }, {
+            $set: {
+              refreshToken: `${refreshToken}`
+            }
+          })
+          return res.status(200).json(resData);
+        }
+      }
+    });
+  });
 });
 
 app.get('/channels', (req, res) => {
-   mongoose.connect(`mongodb://${mongoDbServer}/${mongoDatabase}`, { useNewUrlParser: true }, (err, response) => {
+  mongoose.connect(`mongodb://${mongoDbServer}/${mongoDatabase}`, {
+    useNewUrlParser: true
+  }, (err, response) => {
+    if (err) {
+      return res.status(500).json({
+        "message": "Something went wrong, please try again later."
+      });
+    } else {
+      const collection = response.db.collection(mongoCollection);
+      collection.find().toArray((err, items) => {
         if (err) {
-            return res.status(500).json({ "message": "Something went wrong, please try again later." });
-        } else {
-            const collection = response.db.collection(mongoCollection);
-            collection.find().toArray((err, items) => {
-                if (err) {
-                    res.json(err.toString());
-                    return;
-                };
-                res.setHeader("Content-Type", "application/json");
-                res.status(200).json(items);
-            });
+          res.json(err.toString());
+          return;
         };
-        response.close();
-    });
+        res.setHeader("Content-Type", "application/json");
+        res.status(200).json(items);
+      });
+    };
+    response.close();
+  });
 });
 
 app.get('/posts', (req, res) => {
-    mongoose.connect(`mongodb://${mongoDbServer}/${mongoDatabase}`, { useNewUrlParser: true }, (err, response) => {
+  const post = new Post({
+    _id: mongoose.Types.ObjectId(),
+    title: req.body.title,
+    content: req.body.content,
+    channel: req.body.channel,
+    timestamp: req.body.timestamp,
+    userId:  mongoose.Types.ObjectId()
+  });
+  console.log(req.body.title);
+  post.save().then(result => {
+    console.log(result);
+  }).catch(err => console.log(err));
+
+  mongoose.connect(`mongodb://${mongoDbServer}/${mongoDatabase}`, {
+    useNewUrlParser: true
+  }, (err, response) => {
+    if (err) {
+      return res.status(500).json({
+        "message": "Something went wrong, please try again later."
+      });
+    } else {
+      const collection = response.db.collection(mongoCollection);
+      collection.find().toArray((err, items) => {
         if (err) {
-            return res.status(500).json({ "message": "Something went wrong, please try again later." });
-        } else {
-            const collection = response.db.collection(mongoCollection);
-            collection.find().toArray((err, items) => {
-                if (err) {
-                    res.json(err.toString());
-                    return;
-                };
-                res.setHeader("Content-Type", "application/json");
-                res.status(200).json(items);
-            });
+          res.json(err.toString());
+          return;
         };
-        response.close();
-    });
+        res.setHeader("Content-Type", "application/json");
+        res.status(200).json(items);
+      });
+    };
+    response.close();
+  });
 });
 
-app.listen(port, (err) => { console.log(err ? err : `Server listening on port ${port}`) });
+app.listen(port, (err) => {
+  console.log(err ? err : `Server listening on port ${port}`)
+});
