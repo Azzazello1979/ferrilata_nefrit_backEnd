@@ -45,14 +45,14 @@ app.post('/refresh-token', (req,res) => {
   }
 
   // 5. Missing refreshToken property from request body 400
-  if (!refreshToken) {
+  if (!req.body.refreshToken) {
   res.setHeader("Content-Type", "application/json");
   res.status(400).json({ "message": "Missing refreshToken." });
   return;
   }
 
   // check if we have such refresh-token
-  User.findOne({refreshToken : req.headers.refreshToken})
+  User.findOne({refreshToken : req.body.refreshToken})
   .then((user) => {
     // such refresh-token exists...now lets see if its a valid one or not
     jwt.verify(user.refreshToken, secret, (err) => {
