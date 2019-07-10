@@ -2,7 +2,7 @@
 
 
 require('dotenv').config('.env');
-const port = process.env.port;
+const PORT = process.env.port;
 const mongoUser = process.env.mongoUser;
 const mongoPassword = process.env.mongoPassword;
 const mongoDatabase = process.env.mongoDatabase;
@@ -35,78 +35,69 @@ mongoose.connect(db, { useNewUrlParser: true })
 
 
 
+// refresh access token backend
+app.post('/refresh-token', (req,res) => {
 
+  // 3. missing content type
+  if (req.headers["content-type"] !== 'application/json') {
+  res.status(400).json({ "message": "Content-type is not specified." });
+  return;
+  }
 
-// refresh access-token backend
-app.post('/refresh-token', (req, res) => {
+  // 5. Missing refreshToken property from request body
+  if (!refreshToken) {
+  res.setHeader("Content-Type", "application/json");
+  res.status(400).json({ "message": "Missing refreshToken." });
+  return;
+  }
 
-
-    // 3. missing content type
-    if (req.headers["content-type"] !== 'application/json') {
-        res.status(400).json({ "message": "Content-type is not specified." });
-        return;
-
-
-    // 5. Missing refreshToken property from request body
-    } else if (!refreshToken) {
+  // check if we have such refresh-token
+  User.findOne({refreshToken : req.headers.refreshToken})
+  .then((user) => {
+    // such refresh-token exists...now lets see if its a valid one or not
+    jwt.verify(user.refreshToken, secret, (err) => {
+      if(err){
+        return res.status(401).json({ "message" : "refresh-token is not valid" });
+      } else {
+        
+      // valid, lets check expiry
+      const decoded = jwt.decode(user.refreshToken)
+      if(decoded.exp < new Date()){
+        // expired!
         res.setHeader("Content-Type", "application/json");
-        res.status(400).json({ "message": "Missing refreshToken." });
-        return;
-    }
+        res.status(401).json({"message":"refresh-token is expired"});
+      // lets generate a new refresh-token & a new access-token,
+      // save new refresh-token with usr data & send new access-token to frontend
 
-    // check if we have such refresh-token
-    User.findOne({refreshToken : req.headers.refreshToken})
-        .then((user) => {
-            if (user.refreshToken){ // if so, lets see if refresh-token is valid
-             const refreshTokenPayload = user.refreshToken.slice(36, user.refreshToken.length);
-                jwt.verify(refreshTokenPayload, secret, (err) => {
-                    if (err){ // refresh-token is not valid!
-                        res.status(401).json( {"message" : "This refresh token is not valid!"} )
-                    } else { // refresh-token is valid, lets check its expiry
-
-                    }
-                })
-
-            } else {
-                res.status(400).json({ "message": "refresh token does not exist"})
-            }
+      } else {
+      // valid & not expired, lets generate new access-token & send to frontend
+        const userPayload = ({
+          username: user.username,
+          password: user.password
         })
-        .catch((err) => {
-            console.log('Error with database connection: ' + err)
-            .res.setHeader("Content-Type", "application/json")
-            .res.status(500).json({ "message": "internal server error"})
-        })
-
-
-
-    // 4.a. refresh token is expired
-    if (decoded.exp < new Date()) {
-        res.status(401).json({ message: 'Expired Token' });
-        return;
-
-
-        // 4.b. Invalid refresh token
-    } else if (tokenPayload) {
-        jwt.verify(tokenPayload, key, (err) => {
-            if (err) {
-                return res.status(401).json({ message: 'Token is not valid' });
-            } else {
-                next();
-            }
-        })
-
-
-        // 1. valid request
-    } else if (refreshToken === "RJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c") {
+        const newAccessToken = jwt.sign(userPayload , secret , {expiresIn: '300'}); //5 mins
         res.setHeader("Content-Type", "application/json");
-        res.status(200).json({ "token": "DIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c" });
-    }
+        res.status(200).json({ "token" : newAccessToken })
+      }
 
+      }
+      })
+
+
+  })
+
+  // internal server error 500
+  .catch((err) =>
+    console.log('Database error: ' + err),
+    res.setHeader("Content-Type", "application/json"),
+    res.status(500).json({"message" : "internal server error"})
+  );
 
 })
 
 
 
 
-
-app.listen(port, (err) => { console.log(err ? err : `Server listening on port ${port}`) })
+app.listen(PORT, () => {
+  console.log(`OK...Express listening on ${PORT}`)
+});
