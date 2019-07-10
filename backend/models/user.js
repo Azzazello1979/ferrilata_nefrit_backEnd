@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema({
-      _id: ObjectId,
+    _id:  mongoose.Schema.Types.ObjectId,
     username: String,
     password: String,
     refreshToken: String
