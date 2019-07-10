@@ -7,7 +7,7 @@ const User = require('./models/user');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const PORT = process.env.port;
-const secretKey = process.env.secretKey;
+const secret = process.env.secret;
 const mongoUser = process.env.mongoUser;
 const mongoPassword = process.env.mongoPassword;
 const mongoDatabase = process.env.mongoDatabase;
@@ -20,6 +20,7 @@ app.use(bodyParser.json());
 const db = `mongodb+srv://${mongoUser}:${mongoPassword}@cluster0-siax1.mongodb.net/${mongoDatabase}?retryWrites=true&w=majority`;
 mongoose.set('useCreateIndex', true); // stop DeprecationWarning (node:9125) ... so you can use uniq:true in Schema
 
+// the one connection
 mongoose.connect(db, { useNewUrlParser: true })
   .then(() => console.log('OK...connected to mongoDB'))
   .catch((err) => console.log('ERROR...connecting to mongoDB ' + err));
@@ -56,15 +57,17 @@ app.post('/register', (req, res) => {
     return;
   }
 
-  let userData = req.body;
-  let startRefreshToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15); // 22 chars. long rand.string
+  const userData = req.body;
+  
 
-  let newUserPayload = {
+  const newUserPayload = {
     username: userData.username,
     password: userData.password
   };
 
-  let startAccessToken = jwt.sign({ newUserPayload }, secretKey, { expiresIn: '300' }); // 5 mins.
+  const startAccessToken = jwt.sign({ newUserPayload }, secret, { expiresIn: '300' }); // 5 mins.
+
+  const startRefreshToken = jwt.sign({ newUserPayload }, secret, { expiresIn: '30d' }); // 30 days.
 
   User.findOne({ username: userData.username }) //look up in database if such username is already registered
     .then((user) => {
@@ -79,7 +82,6 @@ app.post('/register', (req, res) => {
         });
         user.save((err, registeredUser) => {
           if (err) {
-            console.log('database error saving user' + err);
             res.setHeader("Content-Type", "application/json");
             res.status(503).json({ "message": "Error saving user to database." });
             return;
