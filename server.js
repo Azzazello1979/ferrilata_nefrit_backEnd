@@ -38,13 +38,13 @@ mongoose.connect(db, { useNewUrlParser: true })
 // refresh access token backend
 app.post('/refresh-token', (req,res) => {
 
-  // 3. missing content type
+  // 3. missing content type 400
   if (req.headers["content-type"] !== 'application/json') {
   res.status(400).json({ "message": "Content-type is not specified." });
   return;
   }
 
-  // 5. Missing refreshToken property from request body
+  // 5. Missing refreshToken property from request body 400
   if (!refreshToken) {
   res.setHeader("Content-Type", "application/json");
   res.status(400).json({ "message": "Missing refreshToken." });
@@ -57,7 +57,8 @@ app.post('/refresh-token', (req,res) => {
     // such refresh-token exists...now lets see if its a valid one or not
     jwt.verify(user.refreshToken, secret, (err) => {
       if(err){
-        return res.status(401).json({ "message" : "refresh-token is not valid" });
+        res.status(401).json({ "message" : "refresh-token is invalid" });
+        return;
       } else {
         
       // valid, lets check expiry
@@ -65,9 +66,9 @@ app.post('/refresh-token', (req,res) => {
       if(decoded.exp < new Date()){
         // expired!
         res.setHeader("Content-Type", "application/json");
-        res.status(401).json({"message":"refresh-token is expired"});
-      // lets generate a new refresh-token & a new access-token,
-      // save new refresh-token with usr data & send new access-token to frontend
+        res.status(401).json({"message" : "refresh-token is expired"});
+        return;
+
 
       } else {
       // valid & not expired, lets generate new access-token & send to frontend
@@ -75,7 +76,7 @@ app.post('/refresh-token', (req,res) => {
           username: user.username,
           password: user.password
         })
-        const newAccessToken = jwt.sign(userPayload , secret , {expiresIn: '300'}); //5 mins
+        const newAccessToken = jwt.sign(userPayload, secret, {expiresIn: '300'}); //5 mins
         res.setHeader("Content-Type", "application/json");
         res.status(200).json({ "token" : newAccessToken })
       }
@@ -90,7 +91,7 @@ app.post('/refresh-token', (req,res) => {
   .catch((err) =>
     console.log('Database error: ' + err),
     res.setHeader("Content-Type", "application/json"),
-    res.status(500).json({"message" : "internal server error"})
+    res.status(500).json({"message": "Something went wrong, please try again later."})
   );
 
 })
