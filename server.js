@@ -60,14 +60,14 @@ app.post('/register', (req, res) => {
   const userData = req.body;
   
 
-  const newUserPayload = {
+  const newUserPayload = ({
     username: userData.username,
     password: userData.password
-  };
+  });
 
-  const startAccessToken = jwt.sign({ newUserPayload }, secret, { expiresIn: '300' }); // 5 mins.
+  const startAccessToken = jwt.sign( newUserPayload , secret, { expiresIn: '300' }); // 5 mins.
 
-  const startRefreshToken = jwt.sign({ newUserPayload }, secret, { expiresIn: '30d' }); // 30 days.
+  const startRefreshToken = jwt.sign( newUserPayload , secret, { expiresIn: '30d' }); // 30 days.
 
   User.findOne({ username: userData.username }) //look up in database if such username is already registered
     .then((user) => {
