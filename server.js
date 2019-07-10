@@ -64,7 +64,7 @@ app.post('/refresh-token', (req,res) => {
         return res.status(401).json({ "message" : "refresh-token is invalid" });
         
       // valid, lets check expiry
-      } else if (decoded.exp < new Date()){ // expired!
+      } else if (decoded.exp < (Date.now()/1000)){ // expired!
         
         res.setHeader("Content-Type", "application/json");
         return res.status(401).json({"message" : "refresh-token is expired"});
@@ -74,7 +74,7 @@ app.post('/refresh-token', (req,res) => {
           username: user.username,
           password: user.password
         })
-
+  
         const newAccessToken = jwt.sign(userPayload, secret, {expiresIn: '300'}); //5 mins
         res.setHeader("Content-Type", "application/json");
         return res.status(200).json({ "token" : newAccessToken });
