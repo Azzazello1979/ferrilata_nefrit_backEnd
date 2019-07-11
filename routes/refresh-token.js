@@ -1,11 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
-const User = require('./models/user');
+const User = require('./../models/user');
 const secret = process.env.secret;
 const jwt = require('jsonwebtoken');
 
-
+// body-parser is needed to populate req.body
+const bodyParser = require('body-parser');
+router.use(bodyParser.json());
 
 
 
