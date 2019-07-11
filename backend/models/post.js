@@ -9,4 +9,4 @@ const postSchema = mongoose.Schema({
   userId: mongoose.Schema.Types.ObjectId
 });
 
-module.exports = mongoose.model('Post', postSchema);
+module.exports = postSchema;
