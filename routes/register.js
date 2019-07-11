@@ -1,8 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const User = require('./models/user');
+const User = require('./../models/user');
 const secret = process.env.secret;
+
+// body-parser is needed to populare req.body!
+const bodyParser = require('body-parser');
+router.use(bodyParser.json());
+
 
 // REGISTER new user end point
 router.post('/', (req, res) => {
