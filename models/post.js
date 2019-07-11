@@ -6,7 +6,7 @@ const postSchema = mongoose.Schema({
   content: String,
   channel: String,
   timestamp: Number,
-  userId: mongoose.Schema.Types.ObjectId
+  userId: String
 });
 
 module.exports = postSchema;
