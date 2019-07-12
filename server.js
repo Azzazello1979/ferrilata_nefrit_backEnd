@@ -8,6 +8,8 @@ const loginRoute = require('./routes/login');
 const logoutRoute = require('./routes/logout');
 const channelsRoute = require('./routes/channels');
 const postsRoute = require('./routes/posts');
+
+const refreshTokenRoute = require('./routes/refresh-token');
 const middleware = require('./middleware'); // TO BE USED LATER
 const cors = require('cors');
 const bodyParser = require('body-parser');
