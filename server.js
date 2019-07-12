@@ -10,15 +10,8 @@ const loginRoute = require('./routes/login');
 const logoutRoute = require('./routes/logout');
 const channelsRoute = require('./routes/channels');
 const postsRoute = require('./routes/posts');
-const middleware = require('./middleware');
-
-const MongoClient = require('mongodb').MongoClient; // ????
-const key = process.env.key;
-const mongoDB = process.env.mongoDB;
-// const client = new MongoClient(mongoDB, {
-//   useNewUrlParser: true
-// }); // ????
-const jwt = require('jsonwebtoken');
+const middleware = require('./middleware'); // TO BE USED LATER
+const jwt = require('jsonwebtoken'); //REFACT ME
 const cors = require('cors');
 const bodyParser = require('body-parser');
 
