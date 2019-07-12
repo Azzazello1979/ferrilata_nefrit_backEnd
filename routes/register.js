@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 
 const mongoose = require('mongoose');
 const userSchema = require('./../models/user');
-const User = mongoose.model('User', userSchema , users);
+const Users = mongoose.model('User', userSchema , 'users');
 
 const secret = process.env.secret;
 
@@ -53,7 +53,7 @@ router.post('/', (req, res) => {
 
   const startRefreshToken = jwt.sign( newUserPayload , secret, { expiresIn: '30d' }); // 30 days.
 
-  User.findOne({ username: userData.username }) //look up in database if such username is already registered
+  Users.findOne({ username: userData.username }) //look up in database if such username is already registered
     .then((user) => {
       if (user) { // if we already have such username...
         res.setHeader("Content-Type", "application/json");
