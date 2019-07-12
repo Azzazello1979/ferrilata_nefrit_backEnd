@@ -1,28 +1,22 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
+const app = express();
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
 
-
+const PostSchema = require('./../models/post');
+const Posts = mongoose.model('Post', PostSchema);
 
 router.get('/', (req, res) => {
-client.connect(err => {
-  if (err) {
-    return res.status(500).json({
-      "message": "Something went wrong, please try again later."
-    });
-  }
-  const collection = client.db(mongoDatabase).collection(postsCollection);
-  collection.find({
-    channel: `${req.body.channel}`
-  }).toArray((err, items) => {
+  Posts.find({}, (err, items) => {
     if (err) {
       res.json(err.toString());
       return;
     };
     res.setHeader("Content-Type", "application/json");
-    res.status(200).json(items);
+    res.status(200).json([...new Set(items.map(posts => posts.channel))]);
   });
 });
-});
-
 
 module.exports = router;
