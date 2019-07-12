@@ -11,6 +11,7 @@ const postsRoute = require('./routes/posts');
 const middleware = require('./middleware'); // TO BE USED LATER
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const uri = process.env.uri
 
 //Routes
 app.use('/login', loginRoute);
@@ -25,13 +26,13 @@ app.use(bodyParser.urlencoded({
 
 
 //Mongoose connection
-const db = mongoose.connect('mongodb+srv://clairvoyant:myfirstmongoDB@cluster0-0pada.mongodb.net/first-test?retryWrites=true&w=majority', {
-  useNewUrlParser: true
-}).then(() => {
-  console.log("Connected to db")
-}).catch(() => {
-  console.log("Connection failed")
-});
+const db = mongoose.connect(uri, { useNewUrlParser: true })
+  .then(() => {
+    console.log("Connected to db")
+  })
+  .catch(() => {
+    console.log("Connection failed")
+  });
 
 
 app.listen(port, (err) => {
