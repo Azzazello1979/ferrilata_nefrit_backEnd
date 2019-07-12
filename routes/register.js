@@ -1,7 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const User = require('./../models/user');
+
+const mongoose = require('mongoose');
+const userSchema = require('./../models/user');
+const User = mongoose.model('User', userSchema , users);
+
 const secret = process.env.secret;
 
 // body-parser is needed to populare req.body!
