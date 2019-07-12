@@ -3,15 +3,12 @@ const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 require('dotenv').config('.env');
-
 const port = process.env.port;
-
 const loginRoute = require('./routes/login');
 const logoutRoute = require('./routes/logout');
 const channelsRoute = require('./routes/channels');
 const postsRoute = require('./routes/posts');
 const middleware = require('./middleware'); // TO BE USED LATER
-const jwt = require('jsonwebtoken'); //REFACT ME
 const cors = require('cors');
 const bodyParser = require('body-parser');
 

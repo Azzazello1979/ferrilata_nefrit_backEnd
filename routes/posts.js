@@ -1,10 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const app = express();
-const bodyParser = require('body-parser');
-app.use(bodyParser.json());
-
 const PostSchema = require('./../models/post');
 const Posts = mongoose.model('Post', PostSchema);
 const UserSchema = require('./../models/user');
@@ -23,6 +19,7 @@ router.get('/', (req, res) => {
             for (let j = 0; j < users.length; j++) {
               if (posts[i].userId.equals(users[j]._id)) {
                 let payload = {
+                  _id: posts[i]._id,
                   title: posts[i].title,
                   content: posts[i].content,
                   channel: posts[i].channel,

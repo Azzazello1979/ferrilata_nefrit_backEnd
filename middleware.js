@@ -5,7 +5,7 @@ function checkToken(req, res, next) {
   let token = req.headers['x-access-token'] || req.headers['authorization'];
   token = token.slice(7, token.length);
   let decoded = jwt.decode(token);
-  if (decoded.exp < new Date()) {
+  if (decoded.exp < (Date.now() / 1000)) {
     return res.status(401).json({
       message: 'Expired Token'
     });

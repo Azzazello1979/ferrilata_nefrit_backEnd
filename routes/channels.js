@@ -1,9 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const app = express();
-const bodyParser = require('body-parser');
-app.use(bodyParser.json());
 
 const PostSchema = require('./../models/post');
 const Posts = mongoose.model('Post', PostSchema);
