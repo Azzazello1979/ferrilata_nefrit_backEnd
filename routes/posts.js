@@ -21,40 +21,72 @@ const Users = mongoose.model('User', UserSchema);
 
 // })
 
+
+// const user = new Users({
+  //   _id: mongoose.Types.ObjectId,
+  //   username: {
+    //     type: String,
+    //     required: true
+    //   },
+    //   password: String,
+    //   refreshToken: String
+    // })
+    // const post = new Posts({
+      //   _id: mongoose.Types.ObjectId,
+      //   title: String,
+      //   content: String,
+      //   channel: String,
+      //   timestamp: String,
+      //   userId: {
+        //     type: String,
+        //     ref: 'User',
+        //     required: true
+        //   }
+        // });
+//         router.get('/', (req, res) => {
+        
+//         Users.find().then((items1) => {
+//           const users = items1;
+//           Posts.find().then((items2) => {
+//             const posts = items2;
+//             for (let i = 0; i < posts.length; i++) {
+//               for (let j = 0; j < users.length; j++) {
+//           let id = JSON.stringify(posts[i].userId)
+//           console.log(id);
+//           if (JSON.stringify(id) === users[j]._id) {
+//             posts[i].userId = users[j].username
+//           }
+//           // console.log(posts[i].userId = users[j].username);
+//         }
+//       }
+//       res.setHeader("Content-Type", "application/json");
+//       res.status(200).json(posts);
+//       res.status(500).json({
+//         "message": "Something went wrong, please try again later."
+//       });
+//     }).catch((err) => console.log(err));
+//   }).catch((err) => console.log(err));
+// });
+
 router.get('/', (req, res) => {
 
-  const user = new Users({
-    _id: mongoose.Types.ObjectId,
-    username: String,
-    password: String,
-    refreshToken: String
-  })
-  const post = new Posts({
-    _id: mongoose.Types.ObjectId,
-    title: String,
-    content: String,
-    channel: String,
-    timestamp: String,
-    userId: this.userId = user._id
-  }); 
-
-  Users.find().then((items1) => {
-    const users = items1;
-    Posts.find().then((items2) => {
-      const posts = items2;
-      for (let i = 0; i < posts.length; i++) {
-        for (let j = 0; j < users.length; j++) {
-          if (posts[i].userId === users[j]._id) {
-            posts[i].userId = users[j].username
+  Users.find({})((items1) => {
+      const users = items1;
+      Posts.find({})((items2) => {
+          const posts = items2;
+          for (let i = 0; i < posts.length; i++) {
+              let id = JSON.stringify(posts[i].userId)
+              console.log(id);
+              for (let j = 0; j < users.length; j++) {
+                  if (JSON.stringify(id) == JSON.stringify(users[j]._id)) {
+                      posts[i].userId = users[j].username
+                  }
+              }
           }
-          console.log(users[j].username);
-        }
-      }
-      res.setHeader("Content-Type", "application/json");
-      res.status(200).json();
-    }).catch((err) => console.log(err));
-  }).catch((err) => console.log(err));
-});
-
+          res.setHeader("Content-Type", "application/json");
+          res.status(200).json(posts);
+      });
+  })
+})
 
 module.exports = router;
