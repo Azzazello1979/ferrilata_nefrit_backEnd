@@ -42,8 +42,7 @@ router.post('/', (req, res) => {
   
 
   const newUserPayload = ({
-    username: userData.username,
-    password: userData.password
+    username: userData.username
   });
 
   const startAccessToken = jwt.sign( newUserPayload , secret, { expiresIn: '300' }); // 5 mins.
