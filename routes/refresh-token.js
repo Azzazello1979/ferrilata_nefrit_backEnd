@@ -49,8 +49,7 @@ router.post('/', (req,res) => {
       } else { // valid & not expired, lets generate new access-token & send to frontend
 
         const userPayload = ({
-          username: user.username,
-          password: user.password
+          username: user.username
         })
   
         const newAccessToken = jwt.sign(userPayload, secret, {expiresIn: '300'}); //5 mins
