@@ -3,7 +3,7 @@ const router = express.Router();
 const mongoose = require('mongoose');
 
 const userSchema = require('./../models/user');
-const User = mongoose.model('User', userSchema, 'users');
+const Users = mongoose.model('User', userSchema, 'users');
 
 const secret = process.env.secret;
 const jwt = require('jsonwebtoken');
@@ -30,7 +30,7 @@ router.post('/', (req,res) => {
   }
 
   // check if we have such refresh-token
-  User.findOne({refreshToken : req.body.refreshToken})
+  Users.findOne({refreshToken : req.body.refreshToken})
   .then((user) => {
     if(user){ // such refresh-token exists...now lets see if its a valid one or not
     
