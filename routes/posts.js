@@ -6,7 +6,7 @@ const Posts = mongoose.model('Post', PostSchema);
 const UserSchema = require('./../models/user');
 const Users = mongoose.model('User', UserSchema);
 
-router.get('/', (req, res) => {
+router.get('/', (req, res) => {//  posts/:channel?
 
   Users.find({},
     (err, items1) => {
