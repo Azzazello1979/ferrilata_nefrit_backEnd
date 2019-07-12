@@ -1,43 +1,44 @@
-require('dotenv').config('.env');
+'use strict';
 const express = require('express');
 const app = express();
-const bodyParser = require('body-parser');
-
-
 const mongoose = require('mongoose');
-const cors = require('cors');
-const PORT = process.env.port;
-
-const mongoUser = process.env.mongoUser;
-const mongoPassword = process.env.mongoPassword;
-const mongoDatabase = process.env.mongoDatabase;
-
+require('dotenv').config('.env');
+const port = process.env.port;
+const loginRoute = require('./routes/login');
+const logoutRoute = require('./routes/logout');
+const channelsRoute = require('./routes/channels');
+const postsRoute = require('./routes/posts');
 const registerRoute = require('./routes/register');
+const refreshTokenRoute = require('./routes/refresh-token');
+const middleware = require('./middleware'); // TO BE USED LATER
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const uri = process.env.uri
 
 //Routes
+app.use('/login', loginRoute);
+app.use('/logout', logoutRoute);
+app.use('/channels', channelsRoute);
+app.use('/posts', postsRoute);
+app.use('/refresh-token', refreshTokenRoute);
 app.use('/register', registerRoute);
-app.use(cors());
 app.use(bodyParser.json());
+app.use(cors());
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
 
-const db = `mongodb+srv://${mongoUser}:${mongoPassword}@cluster0-siax1.mongodb.net/${mongoDatabase}?retryWrites=true&w=majority`;
-mongoose.set('useCreateIndex', true); // stop DeprecationWarning (node:9125) ... so you can use uniq:true in Schema
-
-// the one connection
-mongoose.connect(db, { useNewUrlParser: true })
-  .then(() => console.log('OK...connected to mongoDB'))
-  .catch((err) => console.log('ERROR...connecting to mongoDB ' + err));
-
-
-
+//Mongoose connection
+const db = mongoose.connect(uri, { useNewUrlParser: true })
+  .then(() => {
+    console.log("Connected to db")
+  })
+  .catch(() => {
+    console.log("Connection failed")
+  });
 
 
-
-
-
-
-
-
-app.listen(PORT, () => {
-  console.log(`OK...Express listening on ${PORT}`)
+app.listen(port, (err) => {
+  console.log(err ? err : `Server listening on port ${port}`)
 });
