@@ -6,6 +6,7 @@ const Posts = mongoose.model('Post', PostSchema);
 const UserSchema = require('./../models/user');
 const Users = mongoose.model('User', UserSchema);
 
+
 router.get('/:channel?', (req, res) => {
   if (!req.params.channel) {
     Users.find({},
@@ -66,5 +67,11 @@ router.get('/:channel?', (req, res) => {
   }
 })
 
+
+
+router.delete('/:postId', function (req, res) {
+  console.log(req.body);
+  res.send('Got a DELETE request at /user')
+})
 
 module.exports = router;
