@@ -5,7 +5,8 @@ const mongoose = require('mongoose');
 require('dotenv').config('.env');
 const bodyParser = require('body-parser');
 const port = process.env.port;
-const uri = process.env.uri
+const uri = process.env.uri;
+const uri2 = process.env.uri2;
 const cors = require('cors');
 const refreshTokenRoute = require('./routes/refresh-token');
 
@@ -26,7 +27,7 @@ app.use(bodyParser.urlencoded({
 mongoose.set('useCreateIndex', true);
 
 //Mongoose connection
-const db = mongoose.connect(uri, { useNewUrlParser: true })
+const db = mongoose.connect(uri2, { useNewUrlParser: true })
   .then(() => {
     console.log("Connected to db")
   })
