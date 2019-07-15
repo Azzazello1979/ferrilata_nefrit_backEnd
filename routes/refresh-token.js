@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const userSchema = require('./../models/user');
 const Users = mongoose.model('User', userSchema, 'users');
 
-const secret = process.env.secret;
+const key = process.env.key;
 const jwt = require('jsonwebtoken');
 
 // body-parser is needed to populate req.body
@@ -20,6 +20,7 @@ router.post('/', (req,res) => {
 
   // 3. missing content type 400
   if (req.headers["content-type"] !== 'application/json') {
+  res.setHeader("Content-Type", "application/json");
   return res.status(400).json({ "message": "Content-type is not specified." });
   }
 
@@ -30,11 +31,14 @@ router.post('/', (req,res) => {
   }
 
   // check if we have such refresh-token
+
+
+
   Users.findOne({refreshToken : req.body.refreshToken})
   .then((user) => {
     if(user){ // such refresh-token exists...now lets see if its a valid one or not
     
-    jwt.verify(user.refreshToken, secret, (err) => {
+    jwt.verify(user.refreshToken, key, (err) => {
       
       const decoded = jwt.decode(user.refreshToken);
 
@@ -69,7 +73,7 @@ router.post('/', (req,res) => {
     (err) => res.status(500)
     .json({"message": "Something went wrong, please try again later." })
     .console.log('Database error: ' + err)
-    );
+    )
 
   })
 
