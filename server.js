@@ -22,6 +22,8 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
+//Mongoose stop deprecation warning - needed to use unique:true @ schemas
+mongoose.set('useCreateIndex', true);
 
 //Mongoose connection
 const db = mongoose.connect(uri, { useNewUrlParser: true })
