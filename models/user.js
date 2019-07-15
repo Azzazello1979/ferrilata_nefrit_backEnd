@@ -9,7 +9,8 @@ const userSchema = new Schema({
     unique: true
   },
   password: {
-    type: String,
+    type: [String],
+    default: undefined,
     required: true
   },
   refreshToken: {
