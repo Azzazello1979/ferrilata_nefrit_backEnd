@@ -41,7 +41,6 @@ router.post('/', (req, res) => {
   }
 
   const userData = req.body;
-
   const newUserPayload = ({
     username: userData.username
   });
