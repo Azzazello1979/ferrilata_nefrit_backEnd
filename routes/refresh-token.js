@@ -65,7 +65,11 @@ router.post('/', (req,res) => {
       return res.status(400).json({"message":"user with that refresh-token does not exist"})
     }
 
-  }).catch((err) => console.log('Database error: ' + err));
+  }).catch( // 500 internal server error
+    (err) => res.status(500)
+    .json({"message": "Something went wrong, please try again later." })
+    .console.log('Database error: ' + err)
+    );
 
   })
 
