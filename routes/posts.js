@@ -10,6 +10,7 @@ const Posts = mongoose.model('Post', PostSchema);
 const UserSchema = require('./../models/user');
 const Users = mongoose.model('User', UserSchema);
 
+mongoose.set('useFindAndModify', false);
 
 // router.get('/', (req, res) => {
 
@@ -68,25 +69,35 @@ const Users = mongoose.model('User', UserSchema);
 //   }).catch((err) => console.log(err));
 // });
 
-router.get('/', (req, res) => {
+// router.get('/', (req, res) => {
 
-  Users.find({})((items1) => {
-      const users = items1;
-      Posts.find({})((items2) => {
-          const posts = items2;
-          for (let i = 0; i < posts.length; i++) {
-              let id = JSON.stringify(posts[i].userId)
-              console.log(id);
-              for (let j = 0; j < users.length; j++) {
-                  if (JSON.stringify(id) == JSON.stringify(users[j]._id)) {
-                      posts[i].userId = users[j].username
-                  }
-              }
-          }
-          res.setHeader("Content-Type", "application/json");
-          res.status(200).json(posts);
-      });
-  })
+//   Users.find({})((items1) => {
+//       const users = items1;
+//       Posts.find({})((items2) => {
+//           const posts = items2;
+//           for (let i = 0; i < posts.length; i++) {
+//               let id = JSON.stringify(posts[i].userId)
+//               console.log(id);
+//               for (let j = 0; j < users.length; j++) {
+//                   if (JSON.stringify(id) == JSON.stringify(users[j]._id)) {
+//                       posts[i].userId = users[j].username
+//                   }
+//               }
+//           }
+//           res.setHeader("Content-Type", "application/json");
+//           res.status(200).json(posts);
+//       });
+//   })
+// })
+
+router.delete('/:postId', function (req, res) {
+  console.log(req.params.postId);
+  Posts.findOneAndRemove({_id: req.params.postId}).then((post)=>{
+    res.send(post)
+  }).catch(err => console.log(err));
+  res.setHeader("Content-Type", "application/json");
+  res.sendStatus(204)
 })
+
 
 module.exports = router;
