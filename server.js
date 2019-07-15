@@ -10,6 +10,7 @@ const channelsRoute = require('./routes/channels');
 const postsRoute = require('./routes/posts');
 const middleware = require('./middleware'); // TO BE USED LATER
 const cors = require('cors');
+app.use(cors());
 const bodyParser = require('body-parser');
 const uri = process.env.uri
 
@@ -19,7 +20,6 @@ app.use('/logout', logoutRoute);
 app.use('/channels', channelsRoute);
 app.use('/posts', postsRoute);
 app.use(bodyParser.json());
-app.use(cors());
 app.use(bodyParser.urlencoded({
   extended: true
 }));
