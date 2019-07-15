@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-
+const password = require('password-hash-and-salt');
 const mongoose = require('mongoose');
 const userSchema = require('./../models/user');
 const Users = mongoose.model('User', userSchema , 'users');
@@ -59,8 +59,12 @@ router.post('/', (req, res) => {
         res.setHeader("Content-Type", "application/json");
         res.status(400).json({ "message": "Username is already taken." });
       } else { // ..if not, let's register user...
+
+        // 1st encryp password!
+
+        let encryptedPassword; // encryp userData.password
         let user = new User({
-          "password": userData.password,
+          "password": encryptedPassword,
           "username": userData.username,
           "refreshToken": startRefreshToken
         });
