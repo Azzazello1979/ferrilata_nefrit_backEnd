@@ -19,10 +19,7 @@ app.use('/login', loginRoute);
 app.use('/logout', logoutRoute);
 app.use('/channels', channelsRoute);
 app.use('/posts', postsRoute);
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({
-  extended: true
-}));
+
 
 
 //Mongoose connection

@@ -62,3 +62,5 @@ router.get('/:channel?', (req, res) => {
       })
   }
 });
+
+module.exports = router;

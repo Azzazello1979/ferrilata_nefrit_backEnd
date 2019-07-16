@@ -9,10 +9,13 @@ const Users = mongoose.model('User', UserSchema);
 
 router.post('/', function (req, res) {
     const refreshToken = req.body.refreshToken;
+    console.log(req.body)
     if (!refreshToken) {
         res.status(400).json({ message: 'Missing token.' });
     } else {
         Users.find({ refreshToken: `${refreshToken}` }, (err, items) => {
+            console.log('elértem ide')
+            console.log(items);
             if (err) {
                 return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
             } else {
