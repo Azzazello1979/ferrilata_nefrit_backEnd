@@ -10,11 +10,9 @@ const Users = mongoose.model('User', UserSchema);
 router.get('/:channel?', (req, res) => {
   if (!req.params.channel) {
     Users.find({},
-      (err, items1) => {
-        const users = items1;
+      (err, users) => {
         Posts.find({},
-          (err, items2) => {
-            const posts = items2;
+          (err, posts) => {
             let sendBackData = [];
             for (let i = 0; i < posts.length; i++) {
               for (let j = 0; j < users.length; j++) {
@@ -37,13 +35,11 @@ router.get('/:channel?', (req, res) => {
       })
   } else {
     Users.find({},
-      (err, items1) => {
-        const users = items1;
-        Posts.find({ channel: req.params.channel }, (err, items2) => {
+      (err, users) => {
+        Posts.find({ channel: req.params.channel }, (err, posts) => {
           if (err) {
             return res.json({ "message": "No such channel" })
           };
-          const posts = items2;
           let sendBackData = [];
           for (let i = 0; i < posts.length; i++) {
             for (let j = 0; j < users.length; j++) {
@@ -65,13 +61,4 @@ router.get('/:channel?', (req, res) => {
         })
       })
   }
-})
-
-
-
-router.delete('/:postId', function (req, res) {
-  console.log(req.body);
-  res.send('Got a DELETE request at /user')
-})
-
-module.exports = router;
+});
