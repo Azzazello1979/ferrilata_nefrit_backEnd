@@ -43,6 +43,9 @@ const db = mongoose.connect('mongodb+srv://clairvoyant:myfirstmongoDB@cluster0-0
   console.log("Connection failed")
 });
 
+app.use(function(err,req,res,next){
+  console.log(err);
+})
 
 app.listen(port, (err) => {
   console.log(err ? err : `Server listening on port ${port}`)
