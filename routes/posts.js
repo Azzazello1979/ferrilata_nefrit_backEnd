@@ -23,7 +23,9 @@ router.get('/:channel?', (req, res) => {
                     content: posts[i].content,
                     channel: posts[i].channel,
                     timestamp: posts[i].timestamp,
-                    username: users[j].username
+                    username: users[j].username,
+                    upVotes: posts[i].upVotes,
+                    downVotes: posts[i].downVotes,
                   };
                   sendBackData.push(payload);
                 }
@@ -50,7 +52,9 @@ router.get('/:channel?', (req, res) => {
                   content: posts[i].content,
                   channel: posts[i].channel,
                   timestamp: posts[i].timestamp,
-                  username: users[j].username
+                  username: users[j].username,
+                  upVotes: posts[i].upVotes,
+                  downVotes: posts[i].downVotes,
                 };
                 sendBackData.push(payload);
               }

@@ -22,6 +22,14 @@ const postSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
+  },
+  upVotes:{
+    type: [mongoose.Schema.Types.ObjectId],
+    required:true
+  },
+  downVotes:{
+    type: [mongoose.Schema.Types.ObjectId],
+    required:true
   }
 });
 
