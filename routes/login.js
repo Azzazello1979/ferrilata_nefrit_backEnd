@@ -8,6 +8,7 @@ const jwt = require('jsonwebtoken');
 const UserSchema = require('./../models/user');
 const Users = mongoose.model('User', UserSchema);
 const key = process.env.key
+mongoose.set('useFindAndModify', false);
 
 router.post('/', (req, res) => {
   if (req.headers["content-type"] !== 'application/json') {
@@ -29,8 +30,9 @@ router.post('/', (req, res) => {
         let refreshToken = jwt.sign({ id: items[0]._id, username: items[0].username }, key, { expiresIn: '30d' });
         let token = jwt.sign({ id: items[0]._id, username: items[0].username }, key, { expiresIn: '1hr' });
         let resData = { '_id': items[0]._id, 'username': items[0].username, tokens: { 'jwt': token, 'refreshToken': refreshToken } }
-        Users.update({ username: `${req.body.username}` },{ refreshToken: `${refreshToken}` });
-        return res.status(200).json(resData);
+        Users.findOneAndUpdate({ username: req.body.username }, { refreshToken: refreshToken }, { upsert: true }, function (err, doc) {
+          return res.status(200).json(resData);
+        });
       }
     }
   });
