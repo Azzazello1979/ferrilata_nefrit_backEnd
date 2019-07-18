@@ -1,10 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const sha256 = require('sha256');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const userSchema = require('./../models/user');
 const User = mongoose.model('User', userSchema, 'users');
 const key = process.env.key;
+const salt = process.env.salt;
 
 
 // body-parser is needed to populare req.body!
@@ -14,28 +16,24 @@ router.use(bodyParser.json());
 
 // REGISTER new user end point
 router.post('/', (req, res) => {
+res.setHeader("Content-Type", "application/json");
 
   // missing content type, 400 error
   if (req.headers["content-type"] !== 'application/json') {
-    res.setHeader("Content-Type", "application/json");
     return res.status(400).json({ "message": "Content-type is not specified." });
   }
 
 
   // missing property from req. body, 400 error
   if (!req.body.username && !req.body.password) {
-    res.setHeader("Content-Type", "application/json");
     return res.status(400).json({ "message": "Missing username and password" });
 
 
   } else if (!req.body.username) {
-
-    res.setHeader("Content-Type", "application/json");
     return res.status(400).json({ "message": "Missing username" });
 
 
   } else if (!req.body.password) {
-    res.setHeader("Content-Type", "application/json");
     return res.status(400).json({ "message": "Missing password" });
 
   }
@@ -52,21 +50,19 @@ router.post('/', (req, res) => {
   User.findOne({ username: userData.username }) //look up in database if such username is already registered
     .then((registeredUser) => {
       if (registeredUser) { // if we already have such username...
-        res.setHeader("Content-Type", "application/json");
         res.status(400).json({ "message": "Username is already taken." });
+
       } else { // ..if not, let's register user...
         let newUser = new User({
-          "password": userData.password,
+          "password": sha256(userData.password + salt),
           "username": userData.username,
           "refreshToken": startRefreshToken
         });
         newUser.save((err, registeredUser) => {
           if (err) {
-            res.setHeader("Content-Type", "application/json");
-            res.status(503).json({ "message": "Error saving user to database." });
-            return;
+            return res.status(503).json({ "message": "Error saving user to database." });
+            
           } else {
-            res.setHeader("Content-Type", "application/json");
             res.status(200).json({
               "_id": registeredUser._id,
               "username": registeredUser.username,
@@ -78,9 +74,8 @@ router.post('/', (req, res) => {
       }
     })
     .catch( // 500 internal server error
-      (err) => res.status(500)
+      () => res.status(500)
         .json({ "message": "Something went wrong, please try again later." })
-        .console.log('Error ' + err)
     );
 })
 
