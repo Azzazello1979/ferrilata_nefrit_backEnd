@@ -20,8 +20,6 @@ app.use('/logout', logoutRoute);
 app.use('/channels', channelsRoute);
 app.use('/posts', postsRoute);
 
-
-
 //Mongoose connection
 const db = mongoose.connect(uri, { useNewUrlParser: true })
   .then(() => {
