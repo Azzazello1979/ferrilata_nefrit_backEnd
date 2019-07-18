@@ -90,15 +90,20 @@ router.patch('/:postId?', (req, res) => {
         let decoded = jwt.decode(token);
         userId = decoded.id
         //FIXME: MULTIPLE LIKES
-        Posts.find({ _id: req.params.postId }, (err, posts) => {
+        Posts.find({ _id: req.params.postId }, (err, post) => {
           if (err) {
             return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
-          } else if (posts.length < 1) {
+          } else if (post.length < 1) {
             return res.status(404).json({ "message": "There is no such post." })
           } else if (req.body.liked == true) {
-            Posts.findOneAndUpdate({ _id: req.params.postId }, { $push: { upVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
-              return res.status(200).json(doc);
-            });
+            // if (post.upVotes.includes(userId)){
+            //   return res.status().json({})
+            // }
+            // else {
+              Posts.findOneAndUpdate({ _id: req.params.postId }, { $push: { upVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
+                return res.status(200).json(doc);
+              });
+            // }
           } else {
             Posts.findOneAndUpdate({ _id: req.params.postId }, { $push: { downVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
               return res.status(200).json(doc);
