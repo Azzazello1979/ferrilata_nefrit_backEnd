@@ -16,20 +16,21 @@ const postSchema = mongoose.Schema({
     },
     timestamp: {
         type: Number,
-        required: true
+        required: false,
+        default: Date.now()
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: true
+        required: false
     },
     upVote: {
         type: Array,
-        required: true
+        required: false
     },
     downVote: {
         type: Array,
-        required: true
+        required: false
     }
 });
 
