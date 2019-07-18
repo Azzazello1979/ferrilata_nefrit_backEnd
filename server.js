@@ -7,17 +7,15 @@ require('dotenv').config('.env');
 const bodyParser = require('body-parser');
 const port = process.env.port;
 const uri = process.env.uri;
+const registerRoute = require('./routes/register');
 const cors = require('cors');
-const refreshTokenRoute = require('./routes/refresh-token');
-
-
 
 
 
 //Routes
 app.use(cors());
 
-app.use('/refresh-token', refreshTokenRoute);
+app.use('/register', registerRoute);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
@@ -27,13 +25,15 @@ app.use(bodyParser.urlencoded({
 mongoose.set('useCreateIndex', true);
 
 //Mongoose connection
-const db = mongoose.connect(uri, { useNewUrlParser: true })
+mongoose.connect(uri, { useNewUrlParser: true })
   .then(() => {
     console.log("Connected to db")
   })
   .catch(() => {
     console.log("Connection failed")
   });
+
+
 
 
 app.listen(port, (err) => {
