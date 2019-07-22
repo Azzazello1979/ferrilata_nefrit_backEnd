@@ -13,6 +13,34 @@ const key = process.env.key;
 
 const middleware = require('../middleware'); // MIGHT USE
 
+// router.get('/:channel?', (req, res) => {
+
+//     Posts.find({}, (err, users) => {})
+//         // .populate('user', '_id')
+//         // .exec()
+//         .then(docs => {
+//             res.status(200).json(docs)
+//         })
+//         .catch(err => res.status(500).json({
+//             "message": "Something went wrong, please try again later."
+//         }))
+
+//     // res.status(200).send('ALL OK')
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 router.get('/:channel?', (req, res) => {
     if (!req.params.channel) {
         Users.find({},

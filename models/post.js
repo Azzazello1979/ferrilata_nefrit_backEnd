@@ -17,11 +17,11 @@ const postSchema = mongoose.Schema({
     timestamp: {
         type: Number,
         required: false,
-        default: Date.now()
+        // default: Date.now()
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'user',
         required: false
     },
     upVote: {
