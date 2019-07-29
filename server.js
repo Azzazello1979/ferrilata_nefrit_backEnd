@@ -9,6 +9,8 @@ const port = process.env.port;
 const uri = process.env.uri;
 const registerRoute = require('./routes/register');
 const usersRoute = require('./routes/users');
+const messagesRoute = require('./routes/messages');
+const refreshTokenRoute = require('./routes/refresh-token');
 const cors = require('cors');
 
 app.use(cors());
@@ -21,6 +23,8 @@ app.use('/channels', channelsRoute);
 app.use('/posts', postsRoute);
 app.use('/users', usersRoute);
 app.use('/register', registerRoute);
+app.use('/messages', messagesRoute);
+app.use('/refresh-token', refreshTokenRoute);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
