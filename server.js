@@ -13,12 +13,6 @@ const cors = require('cors');
 const messagesRoute = require('./routes/messages');
 
 
-
-
-
-
-
-
 //Routes
 app.use(cors());
 
