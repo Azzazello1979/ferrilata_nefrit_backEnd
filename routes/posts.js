@@ -15,8 +15,6 @@ const middleware = require('../middleware'); // MIGHT USE
 
 
 router.delete('/:postId', (req, res) => {
-    let userId = '0';
-    console.log(req.params.postId);
     if (!req.headers['authorization']) { // MISSING TOKEN
         return res.status(401).json({
             "message": "You are not authenticated."
@@ -54,7 +52,6 @@ router.delete('/:postId', (req, res) => {
             }
         })
     } else {
-        console.log(posts);
         return res.status(404).json({
             "message": "There is no such post."
         })
