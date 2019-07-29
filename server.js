@@ -9,8 +9,9 @@ const port = process.env.port;
 const uri = process.env.uri;
 const registerRoute = require('./routes/register');
 const usersRoute = require('./routes/users');
-const cors = require('cors');
 const messagesRoute = require('./routes/messages');
+const refreshTokenRoute = require('./routes/refresh-token');
+const cors = require('cors');
 
 //Routes
 app.use(cors());
