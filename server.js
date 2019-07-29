@@ -10,10 +10,7 @@ const uri = process.env.uri;
 const registerRoute = require('./routes/register');
 const usersRoute = require('./routes/users');
 const cors = require('cors');
-
-
-
-
+const messagesRoute = require('./routes/messages');
 
 
 //Routes
@@ -21,6 +18,7 @@ app.use(cors());
 
 app.use('/users', usersRoute);
 app.use('/register', registerRoute);
+app.use('/messages', messagesRoute);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
   extended: true
