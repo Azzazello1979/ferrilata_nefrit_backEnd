@@ -13,9 +13,14 @@ const messagesRoute = require('./routes/messages');
 const refreshTokenRoute = require('./routes/refresh-token');
 const cors = require('cors');
 
-//Routes
 app.use(cors());
+const bodyParser = require('body-parser');
 
+//Routes
+app.use('/login', loginRoute);
+app.use('/logout', logoutRoute);
+app.use('/channels', channelsRoute);
+app.use('/posts', postsRoute);
 app.use('/users', usersRoute);
 app.use('/register', registerRoute);
 app.use('/messages', messagesRoute);
