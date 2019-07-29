@@ -13,93 +13,17 @@ const key = process.env.key;
 
 const middleware = require('../middleware'); // MIGHT USE
 
-// router.get('/:channel?', (req, res) => {
-
-//     Posts.find({}, (err, users) => {})
-//         // .populate('user', '_id')
-//         // .exec()
-//         .then(docs => {
-//             res.status(200).json(docs)
-//         })
-//         .catch(err => res.status(500).json({
-//             "message": "Something went wrong, please try again later."
-//         }))
-
-//     // res.status(200).send('ALL OK')
-// });
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 router.get('/:channel?', (req, res) => {
-    if (!req.params.channel) {
-        Users.find({},
-            (err, users) => {
-                Posts.find({},
-                    (err, posts) => {
-                        let sendBackData = [];
-                        for (let i = 0; i < posts.length; i++) {
-                            for (let j = 0; j < users.length; j++) {
-                                if (posts[i].userId.equals(users[j]._id)) {
-                                    let payload = {
-                                        _id: posts[i]._id,
-                                        title: posts[i].title,
-                                        content: posts[i].content,
-                                        channel: posts[i].channel,
-                                        timestamp: posts[i].timestamp,
-                                        username: users[j].username
-                                    };
-                                    sendBackData.push(payload);
-                                }
-                            }
-                        }
-                        res.setHeader("Content-Type", "application/json");
-                        res.status(200).json(sendBackData);
-                    });
-            })
-    } else {
-        Users.find({},
-            (err, users) => {
-                Posts.find({
-                    channel: req.params.channel
-                }, (err, posts) => {
-                    if (err) {
-                        return res.json({
-                            "message": "No such channel"
-                        })
-                    };
-                    let sendBackData = [];
-                    for (let i = 0; i < posts.length; i++) {
-                        for (let j = 0; j < users.length; j++) {
-                            if (posts[i].userId.equals(users[j]._id)) {
-                                let payload = {
-                                    _id: posts[i]._id,
-                                    title: posts[i].title,
-                                    content: posts[i].content,
-                                    channel: posts[i].channel,
-                                    timestamp: posts[i].timestamp,
-                                    username: users[j].username
-                                };
-                                sendBackData.push(payload);
-                            }
-                        }
-                    }
-                    res.setHeader("Content-Type", "application/json");
-                    res.status(200).json(sendBackData);
-                })
-            })
-    }
-});
+    Posts.find({})
+        .populate('post', 'username')
+        .exec()
+        .then(userId => {
+            res.setHeader("Content-Type", "application/json");
+            res.status(200).json(userId);
+        })
+})
+
 
 router.delete('/:postId', (req, res) => {
     let userId = '0';
