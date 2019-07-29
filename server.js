@@ -1,52 +1,49 @@
 'use strict';
+
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
 require('dotenv').config('.env');
-
+const bodyParser = require('body-parser');
 const port = process.env.port;
-
+const uri = process.env.uri;
 const loginRoute = require('./routes/login');
 const logoutRoute = require('./routes/logout');
 const channelsRoute = require('./routes/channels');
 const postsRoute = require('./routes/posts');
-const middleware = require('./middleware');
-
-const MongoClient = require('mongodb').MongoClient; // ????
-const key = process.env.key;
-const mongoDB = process.env.mongoDB;
-// const client = new MongoClient(mongoDB, {
-//   useNewUrlParser: true
-// }); // ????
-const jwt = require('jsonwebtoken');
+const registerRoute = require('./routes/register');
+const usersRoute = require('./routes/users');
+const messagesRoute = require('./routes/messages');
+const refreshTokenRoute = require('./routes/refresh-token');
 const cors = require('cors');
-const bodyParser = require('body-parser');
+app.use(cors());
 
 //Routes
 app.use('/login', loginRoute);
 app.use('/logout', logoutRoute);
 app.use('/channels', channelsRoute);
 app.use('/posts', postsRoute);
+app.use('/users', usersRoute);
+app.use('/register', registerRoute);
+app.use('/messages', messagesRoute);
+app.use('/refresh-token', refreshTokenRoute);
 app.use(bodyParser.json());
-app.use(cors());
 app.use(bodyParser.urlencoded({
-  extended: true
+    extended: true
 }));
 
+//Mongoose stop deprecation warning - needed to use unique:true @ schemas
+mongoose.set('useCreateIndex', true);
 
 //Mongoose connection
-const db = mongoose.connect('mongodb+srv://clairvoyant:myfirstmongoDB@cluster0-0pada.mongodb.net/first-test?retryWrites=true&w=majority', {
-  useNewUrlParser: true
-}).then(() => {
-  console.log("Connected to db")
-}).catch(() => {
-  console.log("Connection failed")
-});
-
-app.use(function(err,req,res,next){
-  console.log(err);
-})
+mongoose.connect(uri, { useNewUrlParser: true })
+    .then(() => {
+        console.log("Connected to db")
+    })
+    .catch(() => {
+        console.log("Connection failed")
+    });
 
 app.listen(port, (err) => {
-  console.log(err ? err : `Server listening on port ${port}`)
+    console.log(err ? err : `Server listening on port ${port}`)
 });

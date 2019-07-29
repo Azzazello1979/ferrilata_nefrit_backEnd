@@ -58,4 +58,31 @@ router.delete('/:postId', (req, res) => {
     }
 });
 
+
+router.get('/:channel?', (req, res) => {
+    if (!req.params.channel) {
+        Users.find({},
+            (err, users) => {
+                Posts.find({},
+                    (err, posts) => {
+                        res.setHeader("Content-Type", "application/json");
+                        res.status(200).json(posts);
+                    });
+            })
+    } else {
+        Users.find({},
+            (err, users) => {
+                Posts.find({ channel: req.params.channel }, (err, posts) => {
+                    if (err) {
+                        return res.json({ "message": "No such channel" })
+                    };
+                    res.setHeader("Content-Type", "application/json");
+                    res.status(200).json(posts);
+                })
+            })
+    }
+});
+
+
+
 module.exports = router;
