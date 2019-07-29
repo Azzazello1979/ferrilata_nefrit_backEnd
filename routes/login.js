@@ -7,7 +7,9 @@ router.use(bodyParser.json());
 const jwt = require('jsonwebtoken');
 const UserSchema = require('./../models/user');
 const Users = mongoose.model('User', UserSchema);
-const key = process.env.key
+const key = process.env.key;
+const salt = process.env.salt;
+const sha256 = require('sha256');
 mongoose.set('useFindAndModify', false);
 
 router.post('/', (req, res) => {
@@ -16,7 +18,7 @@ router.post('/', (req, res) => {
       "message": "Content-type is not specified."
     });
   }
-  Users.find({ username: `${req.body.username}`, password: `${req.body.password}` }, (err, items) => {
+  Users.find({ username: `${req.body.username}`, password: `${sha256(req.body.password + salt)}` }, (err, items) => {
     if (err) {
       return res.status(500).json({
         'message': 'Something went wrong, please try again later.'

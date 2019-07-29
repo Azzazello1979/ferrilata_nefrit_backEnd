@@ -22,7 +22,7 @@ app.use(cors());
 app.use('/login', loginRoute);
 app.use('/logout', logoutRoute);
 app.use('/channels', channelsRoute);
-app.use('/posts', postsRoute);
+app.use('/', postsRoute);
 app.use('/users', usersRoute);
 app.use('/register', registerRoute);
 app.use('/messages', messagesRoute);
