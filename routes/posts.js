@@ -65,6 +65,9 @@ router.get('/:channel?', (req, res) => {
             (err, users) => {
                 Posts.find({},
                     (err, posts) => {
+                        if (err) {
+                            return res.json({ "message": "No such channel" })
+                        };
                         res.setHeader("Content-Type", "application/json");
                         res.status(200).json(posts);
                     });
