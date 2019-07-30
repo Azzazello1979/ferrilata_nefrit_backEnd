@@ -14,17 +14,42 @@ const key = process.env.key;
 const middleware = require('../middleware'); // MIGHT USE
 
 
+// router.get('/:channel?', (req, res) => {
+//     Posts.find({})
+//         .populate('User', 'username')
+//         .select('userId')
+//         .exec()
+//         .then(posts => {
+//             res.setHeader("Content-Type", "application/json");
+//             // console.log(userId);
+//             res.status(200).json(posts);
+//         })
+// })
+
 router.get('/:channel?', (req, res) => {
-    Posts.find({})
-        .populate('User', 'username')
-        .select('userId')
-        .exec()
-        .then(posts => {
-            res.setHeader("Content-Type", "application/json");
-            // console.log(userId);
-            res.status(200).json(posts);
-        })
-})
+    if (!req.params.channel) {
+        Users.find({},
+            (err, users) => {
+                Posts.find({},
+                    (err, posts) => {
+                        res.setHeader("Content-Type", "application/json");
+                        res.status(200).json(posts);
+                    });
+            })
+    } else {
+        Users.find({},
+            (err, users) => {
+                Posts.find({ channel: req.params.channel }, (err, posts) => {
+                    if (err) {
+                        return res.json({ "message": "No such channel" })
+                    };
+                    res.setHeader("Content-Type", "application/json");
+                    res.status(200).json(posts);
+                })
+            })
+    }
+});
+
 
 
 router.delete('/:postId', (req, res) => {
