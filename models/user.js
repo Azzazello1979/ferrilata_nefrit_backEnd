@@ -3,10 +3,14 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
     _id: mongoose.Schema.Types.ObjectId,
-    username: {
+    posts: [{
         type: mongoose.Schema.Types.ObjectId,
+        ref: 'Post'
+    }],
+    username: {
+        type: String,
         required: true,
-        ref: 'post'
+        ref: 'Post'
     },
     password: {
         type: String,

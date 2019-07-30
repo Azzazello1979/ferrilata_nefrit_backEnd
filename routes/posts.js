@@ -16,11 +16,13 @@ const middleware = require('../middleware'); // MIGHT USE
 
 router.get('/:channel?', (req, res) => {
     Posts.find({})
-        .populate('post', 'username')
+        .populate('User', 'username')
+        .select('userId')
         .exec()
-        .then(userId => {
+        .then(posts => {
             res.setHeader("Content-Type", "application/json");
-            res.status(200).json(userId);
+            // console.log(userId);
+            res.status(200).json(posts);
         })
 })
 
