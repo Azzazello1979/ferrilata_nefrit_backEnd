@@ -29,7 +29,7 @@ app.use('/messages', messagesRoute);
 app.use('/refresh-token', refreshTokenRoute);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
-  extended: true
+    extended: true
 }));
 
 //Mongoose stop deprecation warning - needed to use unique:true @ schemas
@@ -37,13 +37,13 @@ mongoose.set('useCreateIndex', true);
 
 //Mongoose connection
 mongoose.connect(uri, { useNewUrlParser: true })
-  .then(() => {
-    console.log("Connected to db")
-  })
-  .catch(() => {
-    console.log("Connection failed")
-  });
+    .then(() => {
+        console.log("Connected to db")
+    })
+    .catch(() => {
+        console.log("Connection failed")
+    });
 
 app.listen(port, (err) => {
-  console.log(err ? err : `Server listening on port ${port}`)
+    console.log(err ? err : `Server listening on port ${port}`)
 });
