@@ -10,11 +10,11 @@ const uri = process.env.uri;
 const loginRoute = require('./routes/login');
 const logoutRoute = require('./routes/logout');
 const channelsRoute = require('./routes/channels');
-const postsRoute = require('./routes/posts');
 const registerRoute = require('./routes/register');
 const usersRoute = require('./routes/users');
 const messagesRoute = require('./routes/messages');
 const refreshTokenRoute = require('./routes/refresh-token');
+const postsRoute = require('./routes/posts');
 const cors = require('cors');
 app.use(cors());
 
