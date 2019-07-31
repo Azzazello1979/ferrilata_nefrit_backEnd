@@ -16,7 +16,6 @@ const postSchema = mongoose.Schema({
     timestamp: {
         type: Number,
         required: false,
-        // default: Date.now()
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,

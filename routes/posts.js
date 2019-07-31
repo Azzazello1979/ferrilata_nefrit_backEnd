@@ -79,7 +79,6 @@ router.delete('/:postId', (req, res) => {
             }
         })
     } else {
-        console.log(posts);
         return res.status(404).json({
             "message": "There is no such post."
         })
