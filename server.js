@@ -19,7 +19,6 @@ const cors = require('cors');
 app.use(cors());
 app.use(bodyParser.json());
 
-
 //Routes
 app.use('/login', loginRoute);
 app.use('/logout', logoutRoute);

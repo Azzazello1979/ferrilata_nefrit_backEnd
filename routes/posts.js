@@ -7,6 +7,7 @@ const UserSchema = require('./../models/user');
 const Users = mongoose.model('User', UserSchema);
 const jwt = require('jsonwebtoken');
 const key = process.env.key;
+const jwtDecode = require('jwt-decode');
 
 router.get('/:channel?', (req, res) => {
     if (!req.params.channel) {
@@ -33,64 +34,63 @@ router.get('/:channel?', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    console.log(req.body.title, req.body.content, req.body.channel)
     if (req.headers["content-type"] !== 'application/json') {
         return res.status(400).json({
             "message": "Content-type is not specified."
         });
     }
     if (!req.body.title || !req.body.content || !req.body.channel) {
-        console.log('2')
-
         return res.status(400).json({
             "message": `Missing property}`
         });
     }
     if (!req.headers['authorization']) {
-        console.log('3')
-
-        console.log('this')
-
         return res.status(401).json({
             "message": "You are not authenticated."
         })
     } else if (req.headers['authorization']) {
-        console.log('noauth')
         let token = req.headers['authorization'];
         token = token.slice(7, token.length);
         jwt.verify(token, key, (err) => {
             if (err) {
-                console.log('fuh')
                 return res.status(401).json({
                     "message": "You are not authenticated...."
                 })
             } else {
-                console.log('as')
-                let newPost = new Posts({
-                    "title": req.body.title,
-                    "content": req.body.content,
-                    "channel": req.body.channel,
-                    "timestamp": new Date() / 1000,
-                    "userId": req.body.title,
-                    "upVotes": [],
-                    "downVotes:": [],
-                });
-                newPost.save((err, fdsfs) => {
-                    console.log(result)
-                    if (err) {
-                        return res.status(500).json({ "message": "Something went wrong, please try again later." });
-                    } else {
-                        res.status(200).json({
-                            "title": req.body.title,
-                            "content": req.body.content,
-                            "channel": req.body.channel,
-                            "timestamp": new Date() / 1000,
-                            "userId": req.header,
-                            "upVotes": [],
-                            "downVotes:": [],
-                        });
-                    }
-                })
+                let user = jwtDecode(token).username;
+                let userId = jwtDecode(token).id
+                Users.find({ user },
+                    (err, user) => {
+                        if (err) {
+                            return res.status(500).json({ "message": "Something went wrong, please try again later." });
+                        } else {
+                            let newPost = new Posts({
+                                "title": req.body.title,
+                                "content": req.body.content,
+                                "channel": req.body.channel,
+                                "timestamp": new Date(),
+                                "userId": userId,
+                                "upVotes": [],
+                                "downVotes:": [],
+                            });
+                            newPost.save((err, createdPost) => {
+                                if (err) {
+                                    return res.status(500).json({ "message": "Something went wrong, please try again later." });
+                                } else {
+                                    res.status(200).json({
+                                        "_id": mongoose.Schema.Types.ObjectId,
+                                        "title": createdPost.title,
+                                        "content": createdPost.content,
+                                        "channel": createdPost.channel,
+                                        "timestamp": createdPost.timestamp,
+                                        "userId": createdPost._id,
+                                        "upVotes": [],
+                                        "downVotes:": [],
+                                    });
+                                }
+                            })
+                        }
+                    })
             }
         })
     }
