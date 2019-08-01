@@ -6,14 +6,58 @@ const bodyParser = require('body-parser');
 app.use(bodyParser.json());
 const jwt = require('jsonwebtoken');
 const key = process.env.key;
-
+const jwtDecode = require('jwt-decode');
 const PostSchema = require('./../models/post');
 const Posts = mongoose.model('Post', PostSchema);
 const UserSchema = require('./../models/user');
 const Users = mongoose.model('User', UserSchema);
-
 const middleware = require('../middleware'); // MIGHT USE
 
+router.post('/', (req, res) => {
+    if (req.headers["content-type"] !== 'application/json') {
+        return res.status(400).json({
+            "message": "Content-type is not specified."
+        });
+    }
+    if (!req.body.title || !req.body.content || !req.body.channel) {
+        return res.status(400).json({
+            "message": `Missing property}`
+        });
+    }
+    if (!req.headers['authorization']) {
+        return res.status(401).json({
+            "message": "You are not authenticated."
+        })
+    } else {
+        let token = req.headers['authorization'];
+        token = token.slice(7, token.length);
+        jwt.verify(token, key, (err) => {
+            if (err) {
+                return res.status(401).json({
+                    "message": "You are not authenticated"
+                })
+            } else {
+                const userId = jwtDecode(token).id
+                const newPost = new Posts({
+                    "title": req.body.title,
+                    "content": req.body.content,
+                    "channel": req.body.channel,
+                    "timestamp": new Date(),
+                    "userId": userId,
+                    "upVotes": [],
+                    "downVotes:": [],
+                });
+                newPost.save((err, createdPost) => {
+                    if (err) {
+                        return res.status(500).json({ "message": "Something went wrong, please try again later." });
+                    } else {
+                        res.status(200).json(createdPost);
+                    }
+                })
+            }
+        })
+    }
+})
 
 router.get('/:channel?', (req, res) => {
     Posts
@@ -25,10 +69,6 @@ router.get('/:channel?', (req, res) => {
             res.status(200).json(posts);
         }).catch((err) => res.send(err));
 });
-
-
-
-
 
 router.delete('/:postId', (req, res) => {
     let userId = '0';
@@ -74,6 +114,5 @@ router.delete('/:postId', (req, res) => {
         })
     }
 });
-
 
 module.exports = router;

@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const postSchema = mongoose.Schema({
-    _id: mongoose.Schema.Types.ObjectId,
     title: {
         type: String,
         required: true
@@ -15,20 +14,20 @@ const postSchema = mongoose.Schema({
     },
     timestamp: {
         type: Number,
-        required: false,
+        required: true
     },
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: false
+        required: true
     },
-    upVote: {
-        type: Array,
-        required: false
+    upVotes: {
+        type: [mongoose.Schema.Types.ObjectId],
+        required: true
     },
-    downVote: {
-        type: Array,
-        required: false
+    downVotes: {
+        type: [mongoose.Schema.Types.ObjectId],
+        required: true
     }
 });
 
