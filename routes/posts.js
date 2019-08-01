@@ -77,16 +77,8 @@ router.post('/', (req, res) => {
                                 if (err) {
                                     return res.status(500).json({ "message": "Something went wrong, please try again later." });
                                 } else {
-                                    res.status(200).json({
-                                        "_id": mongoose.Schema.Types.ObjectId,
-                                        "title": createdPost.title,
-                                        "content": createdPost.content,
-                                        "channel": createdPost.channel,
-                                        "timestamp": createdPost.timestamp,
-                                        "userId": createdPost._id,
-                                        "upVotes": [],
-                                        "downVotes:": [],
-                                    });
+                                    console.log(createdPost)
+                                    res.status(200).json(createdPost);
                                 }
                             })
                         }
