@@ -37,7 +37,6 @@ router.get('/:channel?', (req, res) => {
 
 router.delete('/:postId', (req, res) => {
     let userId = '0';
-    console.log(req.params.postId);
     if (!req.headers['authorization']) { // MISSING TOKEN
         return res.status(401).json({
             "message": "You are not authenticated."
