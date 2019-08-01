@@ -11,10 +11,32 @@ const PostSchema = require('./../models/post');
 const Posts = mongoose.model('Post', PostSchema);
 const UserSchema = require('./../models/user');
 const Users = mongoose.model('User', UserSchema);
+const app = express();
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+const jwt = require('jsonwebtoken');
+const key = process.env.key;
+
 const middleware = require('../middleware'); // MIGHT USE
 
 
+router.get('/:channel?', (req, res) => {
+    Posts
+        .find(req.params.channel ? { channel: req.params.channel } : {})
+        .populate({ path: 'userId', select: 'username', model: 'User' })
+        .exec()
+        .then(posts => {
+            res.setHeader("Content-Type", "application/json");
+            res.status(200).json(posts);
+        }).catch((err) => res.send(err));
+});
+
+
+
+
+
 router.delete('/:postId', (req, res) => {
+    let userId = '0';
     if (!req.headers['authorization']) { // MISSING TOKEN
         return res.status(401).json({
             "message": "You are not authenticated."
@@ -57,35 +79,6 @@ router.delete('/:postId', (req, res) => {
         })
     }
 });
-
-
-router.get('/:channel?', (req, res) => {
-    if (!req.params.channel) {
-        Users.find({},
-            (err, users) => {
-                Posts.find({},
-                    (err, posts) => {
-                        if (err) {
-                            return res.json({ "message": "No such channel" })
-                        };
-                        res.setHeader("Content-Type", "application/json");
-                        res.status(200).json(posts);
-                    });
-            })
-    } else {
-        Users.find({},
-            (err, users) => {
-                Posts.find({ channel: req.params.channel }, (err, posts) => {
-                    if (err) {
-                        return res.json({ "message": "No such channel" })
-                    };
-                    res.setHeader("Content-Type", "application/json");
-                    res.status(200).json(posts);
-                })
-            })
-    }
-});
-
 
 
 module.exports = router;
