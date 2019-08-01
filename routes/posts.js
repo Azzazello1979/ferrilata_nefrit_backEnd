@@ -15,24 +15,14 @@ const middleware = require('../middleware'); // MIGHT USE
 
 
 router.get('/:channel?', (req, res) => {
-    if (req.params.channel) {
-        Posts.find({ channel: req.params.channel })
-            .populate({ path: 'userId', select: 'username', model: 'User' })
-            .exec()
-            .then(posts => {
-                res.setHeader("Content-Type", "application/json");
-                res.status(200).json(posts);
-            }).catch((err) => res.send(err));
-    } else {
-        Posts.find({})
-            .populate({ path: 'userId', select: 'username', model: 'User' })
-            .exec()
-            .then(posts => {
-                res.setHeader("Content-Type", "application/json");
-                res.status(200).json(posts);
-            }).catch((err) => res.send(err));
-
-    }
+    Posts
+        .find(req.params.channel ? { channel: req.params.channel } : {})
+        .populate({ path: 'userId', select: 'username', model: 'User' })
+        .exec()
+        .then(posts => {
+            res.setHeader("Content-Type", "application/json");
+            res.status(200).json(posts);
+        }).catch((err) => res.send(err));
 });
 
 
