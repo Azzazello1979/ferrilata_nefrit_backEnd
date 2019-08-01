@@ -1,6 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const app = express();
+const bodyParser = require('body-parser');
+app.use(bodyParser.json());
+const jwt = require('jsonwebtoken');
+const key = process.env.key;
+
 const PostSchema = require('./../models/post');
 const Posts = mongoose.model('Post', PostSchema);
 const UserSchema = require('./../models/user');

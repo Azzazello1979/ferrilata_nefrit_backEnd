@@ -1,35 +1,36 @@
 {
-  "name": "ferrilata-nefrit-backend",
-  "version": "1.0.0",
-  "description": "Ferrilata Cohort, Angular project team, Backend",
-  "main": "server.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/green-fox-academy/ferrilata-nefrit-backend.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/green-fox-academy/ferrilata-nefrit-backend/issues"
-  },
-  "homepage": "https://github.com/green-fox-academy/ferrilata-nefrit-backend#readme",
-  "dependencies": {
-    "body-parser": "^1.19.0",
-    "cors": "^2.8.5",
-    "dotenv": "^8.0.0",
-    "express": "^4.17.1",
-    "jsonwebtoken": "^8.5.1",
-    "mongodb": "^3.2.7",
-    "mongoose": "^5.6.4",
-    "sha256": "^0.2.0"
-  },
-  "devDependencies": {
-    "@types/mongodb": "^3.1.28",
-    "@types/mongoose": "^5.5.7"
-  }
+    "name": "ferrilata-nefrit-backend",
+    "version": "1.0.0",
+    "description": "Ferrilata Cohort, Angular project team, Backend",
+    "main": "server.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node server.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/green-fox-academy/ferrilata-nefrit-backend.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/green-fox-academy/ferrilata-nefrit-backend/issues"
+    },
+    "homepage": "https://github.com/green-fox-academy/ferrilata-nefrit-backend#readme",
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "cors": "^2.8.5",
+        "dotenv": "^8.0.0",
+        "express": "^4.17.1",
+        "jsonwebtoken": "^8.5.1",
+        "mongoose": "^5.6.4",
+        "password-hash-and-salt": "^0.1.4",
+        "sha256": "^0.2.0"
+
+    },
+    "devDependencies": {
+        "@types/mongodb": "^3.1.28",
+        "@types/mongoose": "^5.5.7"
+    }
 }
