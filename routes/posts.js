@@ -52,41 +52,32 @@ router.post('/', (req, res) => {
         return res.status(401).json({
             "message": "You are not authenticated."
         })
-    } else if (req.headers['authorization']) {
+    } else {
         let token = req.headers['authorization'];
         token = token.slice(7, token.length);
         jwt.verify(token, key, (err) => {
             if (err) {
                 return res.status(401).json({
-                    "message": "You are not authenticated...."
+                    "message": "You are not authenticated"
                 })
             } else {
-                let user = jwtDecode(token).username;
-                let userId = jwtDecode(token).id
-                Users.find({ user },
-                    (err, user) => {
-                        if (err) {
-                            return res.status(500).json({ "message": "Something went wrong, please try again later." });
-                        } else {
-                            let newPost = new Posts({
-                                "title": req.body.title,
-                                "content": req.body.content,
-                                "channel": req.body.channel,
-                                "timestamp": new Date(),
-                                "userId": userId,
-                                "upVotes": [],
-                                "downVotes:": [],
-                            });
-                            newPost.save((err, createdPost) => {
-                                if (err) {
-                                    return res.status(500).json({ "message": "Something went wrong, please try again later." });
-                                } else {
-                                    console.log(createdPost)
-                                    res.status(200).json(createdPost);
-                                }
-                            })
-                        }
-                    })
+                const userId = jwtDecode(token).id
+                const newPost = new Posts({
+                    "title": req.body.title,
+                    "content": req.body.content,
+                    "channel": req.body.channel,
+                    "timestamp": new Date(),
+                    "userId": userId,
+                    "upVotes": [],
+                    "downVotes:": [],
+                });
+                newPost.save((err, createdPost) => {
+                    if (err) {
+                        return res.status(500).json({ "message": "Something went wrong, please try again later." });
+                    } else {
+                        res.status(200).json(createdPost);
+                    }
+                })
             }
         })
     }
