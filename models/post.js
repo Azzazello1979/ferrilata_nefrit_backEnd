@@ -28,6 +28,10 @@ const postSchema = mongoose.Schema({
     downVotes: {
         type: [mongoose.Schema.Types.ObjectId],
         required: true
+    },
+    type: {
+        type: String,
+        required: false
     }
 });
 
