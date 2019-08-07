@@ -23,11 +23,17 @@ const postSchema = mongoose.Schema({
     },
     upVotes: {
         type: [mongoose.Schema.Types.ObjectId],
-        required: true
+        required: true,
+        default: []
     },
     downVotes: {
         type: [mongoose.Schema.Types.ObjectId],
-        required: true
+        required: true,
+        default: []
+    },
+    url: {
+        type: String,
+        required: false
     },
     type: {
         type: String,

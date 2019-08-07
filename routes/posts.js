@@ -13,15 +13,29 @@ const UserSchema = require('./../models/user');
 const Users = mongoose.model('User', UserSchema);
 const middleware = require('../middleware'); // MIGHT USE
 
+function formatUrl(url) {
+    let httpString = 'http://'
+
+    if (url.substr(0, httpString.length) !== httpString) {
+        url = httpString + url;
+    }
+
+    return url;
+}
+
 router.post('/', (req, res) => {
+    if (req.headers["accept"] === 'application/json') {
+
+    }
     if (req.headers["content-type"] !== 'application/json') {
         return res.status(400).json({
             "message": "Content-type is not specified."
         });
     }
-    if (!req.body.title || !req.body.content || !req.body.channel) {
+    if (!req.body.title || !req.body.channel || !(req.body.url || req.body.content)) {
+        console.log(req.body);
         return res.status(400).json({
-            "message": `Missing property}`
+            "message": `Missing property`
         });
     }
     if (!req.headers['authorization']) {
@@ -46,8 +60,10 @@ router.post('/', (req, res) => {
                     "userId": userId,
                     "upVotes": [],
                     "downVotes:": [],
+                    "url": formatUrl(req.body.url),
                 });
                 newPost.save((err, createdPost) => {
+                    console.log(err);
                     if (err) {
                         return res.status(500).json({ "message": "Something went wrong, please try again later." });
                     } else {
