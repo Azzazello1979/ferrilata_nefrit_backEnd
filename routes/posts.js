@@ -63,7 +63,6 @@ router.post('/', (req, res) => {
                     "url": formatUrl(req.body.url),
                 });
                 newPost.save((err, createdPost) => {
-                    console.log(err);
                     if (err) {
                         return res.status(500).json({ "message": "Something went wrong, please try again later." });
                     } else {
