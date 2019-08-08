@@ -23,13 +23,13 @@ const postSchema = mongoose.Schema({
     ref: 'User',
     required: true
   },
-  upVotes:{
+  upVotes: {
     type: [mongoose.Schema.Types.ObjectId],
-    required:true
+    required: true
   },
-  downVotes:{
+  downVotes: {
     type: [mongoose.Schema.Types.ObjectId],
-    required:true
+    required: true
   }
 });
 

@@ -59,19 +59,39 @@ router.patch('/:postId?', (req, res) => {
           } else if (post.length < 1) {
             return res.status(404).json({ "message": "There is no such post." })
           } else if (req.body.liked == true) {
-            // if (post.upVotes.includes(userId)){
-            //   return res.status().json({})
-            // }
-            // else {
-            Posts.findOneAndUpdate({ _id: req.params.postId }, { $push: { upVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
-              return res.status(200).json(doc);
-            });
-            // }
+            if (post[0].downVotes.includes(userId)) {
+              Posts.findOneAndUpdate({ _id: req.params.postId }, { $pull: { downVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
+                Posts.findOneAndUpdate({ _id: req.params.postId }, { $push: { upVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
+                  return res.status(200).json(doc);
+                });
+              });
+            } else if (post[0].upVotes.includes(userId)) {
+              Posts.findOneAndUpdate({ _id: req.params.postId }, { $pull: { upVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
+                return res.status(200).json({ doc })
+              });
+            }
+            else {
+              Posts.findOneAndUpdate({ _id: req.params.postId }, { $push: { upVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
+                return res.status(200).json(doc);
+              });
+            }
           } else {
-            Posts.findOneAndUpdate({ _id: req.params.postId }, { $push: { downVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
-              return res.status(200).json(doc);
-              //TODO: FILTER THE TWO ARRAYS
-            })
+            if (post[0].upVotes.includes(userId)) {
+              Posts.findOneAndUpdate({ _id: req.params.postId }, { $pull: { upVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
+                Posts.findOneAndUpdate({ _id: req.params.postId }, { $push: { downVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
+                  return res.status(200).json(doc);
+                });
+              });
+            }
+            else if (post[0].downVotes.includes(userId)) {
+              Posts.findOneAndUpdate({ _id: req.params.postId }, { $pull: { downVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
+                return res.status(200).json({ doc })
+              });
+            } else {
+              Posts.findOneAndUpdate({ _id: req.params.postId }, { $push: { downVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
+                return res.status(200).json(doc);
+              });
+            }
           }
         })
       }
