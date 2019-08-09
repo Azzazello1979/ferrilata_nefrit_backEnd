@@ -115,13 +115,6 @@ router.delete('/:postId', (req, res) => {
     }
 });
 
-const bodyParser = require('body-parser');
-router.use(bodyParser.json());
-const jwt = require('jsonwebtoken');
-const key = process.env.key;
-const middleware = require('../middleware'); // MIGHT USE
-
-
 const takeOut = (upOrDown, req, res, userId) => {
   downOrUp = {};
   downOrUp[upOrDown] = userId

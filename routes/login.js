@@ -11,8 +11,7 @@ const key = process.env.key;
 const salt = process.env.salt;
 const sha256 = require('sha256');
 mongoose.set('useFindAndModify', false);
-const salt = process.env.salt;
-const sha256 = require('sha256');
+
 
 router.post('/', (req, res) => {
   if (req.headers["content-type"] !== 'application/json') {
