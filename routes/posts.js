@@ -38,6 +38,31 @@ const key = process.env.key;
 const middleware = require('../middleware'); // MIGHT USE
 
 
+const takeOut = (upOrDown, req, res, userId) => {
+  downOrUp = {};
+  downOrUp[upOrDown] = userId
+  Posts.findOneAndUpdate({ _id: req.params.postId }, { $pull: downOrUp }, { new: true } & { upsert: true }, function (err, doc) {
+    return res.status(200).json({ doc })
+  });
+}
+const pushIn = (upOrDown, req, res, userId) => {
+  downOrUp = {};
+  downOrUp[upOrDown] = userId
+  Posts.findOneAndUpdate({ _id: req.params.postId }, { $push: downOrUp }, { new: true } & { upsert: true }, function (err, doc) {
+    return res.status(200).json({ doc })
+  });
+}
+const takeOutAndPushIn = (output, input, req, res, userId) => {
+  upOrDown = {};
+  upOrDown[output] = userId
+  downOrUp = {};
+  downOrUp[input] = userId
+  Posts.findOneAndUpdate({ _id: req.params.postId }, { $pull: upOrDown }, { new: true } & { upsert: true }, function (err, doc) {
+    Posts.findOneAndUpdate({ _id: req.params.postId }, { $push: downOrUp }, { new: true } & { upsert: true }, function (err, doc) {
+      return res.status(200).json(doc);
+    });
+  });
+}
 router.patch('/:postId?', (req, res) => {
   let userId = '0';
   if (!req.headers['authorization']) {
@@ -52,7 +77,6 @@ router.patch('/:postId?', (req, res) => {
       } else {
         let decoded = jwt.decode(token);
         userId = decoded.id
-        //FIXME: MULTIPLE LIKES
         Posts.find({ _id: req.params.postId }, (err, post) => {
           if (err) {
             return res.status(500).json({ 'message': 'Something went wrong, please try again later.' });
@@ -60,37 +84,21 @@ router.patch('/:postId?', (req, res) => {
             return res.status(404).json({ "message": "There is no such post." })
           } else if (req.body.liked == true) {
             if (post[0].downVotes.includes(userId)) {
-              Posts.findOneAndUpdate({ _id: req.params.postId }, { $pull: { downVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
-                Posts.findOneAndUpdate({ _id: req.params.postId }, { $push: { upVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
-                  return res.status(200).json(doc);
-                });
-              });
+              takeOutAndPushIn('downVotes', 'upVotes', req, res, userId)
             } else if (post[0].upVotes.includes(userId)) {
-              Posts.findOneAndUpdate({ _id: req.params.postId }, { $pull: { upVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
-                return res.status(200).json({ doc })
-              });
+              takeOut('upVotes', req, res, userId)
             }
             else {
-              Posts.findOneAndUpdate({ _id: req.params.postId }, { $push: { upVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
-                return res.status(200).json(doc);
-              });
+              pushIn('upVotes', req, res, userId)
             }
           } else {
             if (post[0].upVotes.includes(userId)) {
-              Posts.findOneAndUpdate({ _id: req.params.postId }, { $pull: { upVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
-                Posts.findOneAndUpdate({ _id: req.params.postId }, { $push: { downVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
-                  return res.status(200).json(doc);
-                });
-              });
+              takeOutAndPushIn('upVotes', 'downVotes', req, res, userId)
             }
             else if (post[0].downVotes.includes(userId)) {
-              Posts.findOneAndUpdate({ _id: req.params.postId }, { $pull: { downVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
-                return res.status(200).json({ doc })
-              });
+              takeOut('downVotes', req, res, userId)
             } else {
-              Posts.findOneAndUpdate({ _id: req.params.postId }, { $push: { downVotes: userId } }, { new: true } & { upsert: true }, function (err, doc) {
-                return res.status(200).json(doc);
-              });
+              pushIn('downVotes', req, res, userId)
             }
           }
         })
