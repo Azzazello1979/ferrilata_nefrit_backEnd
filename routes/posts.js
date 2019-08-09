@@ -21,7 +21,7 @@ router.post('/', (req, res) => {
     }
     if (!req.body.title || !req.body.content || !req.body.channel) {
         return res.status(400).json({
-            "message": `Missing property}`
+            "message": `Missing property`
         });
     }
     if (!req.headers['authorization']) {
