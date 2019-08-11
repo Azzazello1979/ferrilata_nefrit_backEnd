@@ -12,16 +12,10 @@ const Posts = mongoose.model('Post', PostSchema);
 const UserSchema = require('./../models/user');
 const Users = mongoose.model('User', UserSchema);
 const middleware = require('../middleware'); // MIGHT USE
+const prependHttp = require('prepend-http');
 
-function formatUrl(url) {
-    let httpString = 'http://'
+// const withHttp = url => (!/^https?:\/\//i.test(url) && url !== undefined) ? `http://${url}` : url;
 
-    if (url.substr(0, httpString.length) !== httpString) {
-        url = httpString + url;
-    }
-
-    return url;
-}
 
 router.post('/', (req, res) => {
     if (req.headers["accept"] === 'application/json') {
@@ -33,7 +27,6 @@ router.post('/', (req, res) => {
         });
     }
     if (!req.body.title || !req.body.channel || !(req.body.url || req.body.content)) {
-        console.log(req.body);
         return res.status(400).json({
             "message": `Missing property`
         });
@@ -60,7 +53,7 @@ router.post('/', (req, res) => {
                     "userId": userId,
                     "upVotes": [],
                     "downVotes:": [],
-                    "url": formatUrl(req.body.url),
+                    "url": prependHttp(req.body.url)
                 });
                 newPost.save((err, createdPost) => {
                     if (err) {
