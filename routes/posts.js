@@ -12,16 +12,23 @@ const Posts = mongoose.model('Post', PostSchema);
 const UserSchema = require('./../models/user');
 const Users = mongoose.model('User', UserSchema);
 const middleware = require('../middleware'); // MIGHT USE
+const prependHttp = require('prepend-http');
+
+// const withHttp = url => (!/^https?:\/\//i.test(url) && url !== undefined) ? `http://${url}` : url;
+
 
 router.post('/', (req, res) => {
+    if (req.headers["accept"] === 'application/json') {
+
+    }
     if (req.headers["content-type"] !== 'application/json') {
         return res.status(400).json({
             "message": "Content-type is not specified."
         });
     }
-    if (!req.body.title || !req.body.content || !req.body.channel) {
+    if (!req.body.title || !req.body.channel || !(req.body.url || req.body.content)) {
         return res.status(400).json({
-            "message": `Missing property}`
+            "message": `Missing property`
         });
     }
     if (!req.headers['authorization']) {
@@ -46,6 +53,7 @@ router.post('/', (req, res) => {
                     "userId": userId,
                     "upVotes": [],
                     "downVotes:": [],
+                    "url": prependHttp(req.body.url)
                 });
                 newPost.save((err, createdPost) => {
                     if (err) {

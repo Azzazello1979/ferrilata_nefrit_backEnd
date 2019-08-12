@@ -75,7 +75,7 @@ router.post('/', (req, res) => {
         })
         .catch( // 500 internal server error
             () => res.status(500)
-                .json({ "message": "Something went wrong, please try again later." })
+            .json({ "message": "Something went wrong, please try again later." })
         );
 })
 
